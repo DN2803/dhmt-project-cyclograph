@@ -63,7 +63,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:layout_marginBottom="15dp"
         android:gravity="center"
         android:orientation="horizontal"
@@ -74,37 +74,48 @@
 
         <ImageButton
             android:id="@+id/btn_add"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:src="@android:drawable/btn_star"
-            android:contentDescription="add to generative shape"/>
-
-        <ImageButton
-            android:id="@+id/btn_generate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:src="@android:drawable/btn_star"
-            android:contentDescription="generate result"/>
+            android:padding="10dp"
+            android:background="@drawable/btn_primary"
+            android:contentDescription="add to generative shape"
+            android:src="@mipmap/paint_brush"
+            android:scaleType="fitCenter"/>
 
         <ImageButton
             android:id="@+id/btn_shape"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:src="@android:drawable/btn_star"
-            android:contentDescription="choose generative shape"/>
-
-        <ImageButton
-            android:id="@+id/btn_color"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:padding="10dp"
-            android:scaleType="center"
-            android:src="@android:drawable/btn_star"
-            android:contentDescription="choose color to draw"/>
+            android:background="@drawable/btn_primary"
+            android:contentDescription="generate result"
+            android:src="@mipmap/shapes"
+            android:scaleType="fitCenter"/>
+
+        <ImageButton
+            android:id="@+id/btn_colors"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:padding="10dp"
+            android:background="@drawable/btn_primary"
+            android:contentDescription="choose color to draw"
+            android:src="@mipmap/color_wheel"
+            android:scaleType="fitCenter"/>
+
+        <ImageButton
+            android:id="@+id/btn_generate"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/btn_primary"
+            android:contentDescription="generate"
+            android:padding="10dp"
+
+            android:src="@mipmap/save_instagram"
+            android:scaleType="fitCenter"/>
     </LinearLayout>
 
 
