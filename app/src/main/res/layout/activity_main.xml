@@ -50,14 +50,11 @@
         android:layout_marginTop="50dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
-        <SurfaceView
-            android:id="@+id/surfaceView"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.cg76.drawingapp.GLESSurfaceView
+            android:id="@+id/glSurfaceView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
     </FrameLayout>
 
@@ -81,7 +78,8 @@
             android:background="@drawable/btn_primary"
             android:contentDescription="add to generative shape"
             android:src="@mipmap/paint_brush"
-            android:scaleType="fitCenter"/>
+            android:scaleType="fitCenter"
+            android:layout_gravity="center"/>
 
         <ImageButton
             android:id="@+id/btn_shape"
@@ -92,7 +90,8 @@
             android:background="@drawable/btn_primary"
             android:contentDescription="generate result"
             android:src="@mipmap/shapes"
-            android:scaleType="fitCenter"/>
+            android:scaleType="fitCenter"
+            android:layout_gravity="center"/>
 
         <ImageButton
             android:id="@+id/btn_colors"
@@ -103,7 +102,8 @@
             android:background="@drawable/btn_primary"
             android:contentDescription="choose color to draw"
             android:src="@mipmap/color_wheel"
-            android:scaleType="fitCenter"/>
+            android:scaleType="fitCenter"
+            android:layout_gravity="center"/>
 
         <ImageButton
             android:id="@+id/btn_generate"
@@ -113,7 +113,7 @@
             android:background="@drawable/btn_primary"
             android:contentDescription="generate"
             android:padding="10dp"
-
+            android:layout_gravity="center"
             android:src="@mipmap/save_instagram"
             android:scaleType="fitCenter"/>
     </LinearLayout>
