@@ -24,14 +24,21 @@ class GLESRenderer: GLSurfaceView.Renderer {
 //        lVertices.add(Vertex(0.5f, 0.603135f, 0.0f))//
 //        var mLine = Line(2, lVertices, BLACK, 20f)
 
-        var tVertices = mutableListOf<Vertex>()
-        tVertices.add(Vertex(0.0f, 0.75f, 0.0f))
-        tVertices.add(Vertex(-0.5f, -0.5f, 0.0f))
-        tVertices.add(Vertex(0.5f, -0.5f, 0.0f))
-        var mTriangle = Triangle(3,tVertices, RED,15f)
+//        var tVertices = mutableListOf<Vertex>()
+//        tVertices.add(Vertex(0.0f, 0.75f, 0.0f))
+//        tVertices.add(Vertex(-0.5f, -0.5f, 0.0f))
+//        tVertices.add(Vertex(0.5f, -0.5f, 0.0f))
+//        var mTriangle = Triangle(3,tVertices, RED,15f)
 
 //        shapes.add(mLine)
-        shapes.add(mTriangle)
+//        shapes.add(mTriangle)
+
+
+//        var cVertices = mutableListOf<Vertex>()
+//
+//        var mCircle = Circle(364, cVertices, RED, 10f)
+//        mCircle.setPossition(0f, 0f, 0.5f, 0.6f)
+//        shapes.add(mCircle)
     }
 
     // vPMatrix is an abbreviation for "Model View Projection Matrix"

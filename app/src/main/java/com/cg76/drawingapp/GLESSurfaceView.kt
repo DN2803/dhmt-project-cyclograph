@@ -5,6 +5,8 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import com.cg76.drawingapp.Shape.*
 
+
+
 class GLESSurfaceView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null
@@ -47,9 +49,10 @@ class GLESSurfaceView @JvmOverloads constructor(
                 previousX1 = e.getX(0)
                 previousY1 = e.getY(0)
 
-//                var x1 = (previousX1 / this.width) * 2 - 1
-//                var y1 = 1 - 2 * (previousY1 / this.height)
-//                vertices[0] = Vertex(x1,y1)
+                var x1 = (previousX1 / this.width) * 2 - 1
+                var y1 = 1 - 2 * (previousY1 / this.height)
+                vertices[0] = Vertex(x1,y1, 0f)
+                println("x1, y1: $x1, $y1")
             }
 
             MotionEvent.ACTION_POINTER_DOWN -> {
@@ -59,14 +62,14 @@ class GLESSurfaceView @JvmOverloads constructor(
             }
 
             MotionEvent.ACTION_MOVE -> {
-//                if (pointerCount == 1) {
-//                    var x2 = e.getX(0)
-//                    x2 = (x2 / this.width) * 2 - 1
-//                    var y2 = e.getY(0)
-//                    y2 = 1 - 2 * (y2 / this.height)
-//
-//                    vertices[1] = Vertex(x2,y2)
-//                }
+                if (pointerCount == 1) {
+                    var x2 = e.getX(0)
+                    x2 = (x2 / this.width) * 2 - 1
+                    var y2 = e.getY(0)
+                    y2 = 1 - 2 * (y2 / this.height)
+                    println("x2, y2: $x2, $y2")
+                    vertices[1] = Vertex(x2,y2, 0f)
+                }
                 // Di chuyển ngón tay
                 if (pointerCount == 2) {
                     // Nếu có đủ hai ngón tay, tính toán sự thay đổi góc xoay
@@ -93,10 +96,11 @@ class GLESSurfaceView @JvmOverloads constructor(
                 }
             }
 
-//            MotionEvent.ACTION_UP -> {
-//                renderer.addShape(Line(2,vertices,BLACK,5f))
-//                requestRender()
-//            }
+            MotionEvent.ACTION_UP -> {
+                println("$vertices[0], $vertices[1]")
+                renderer.addShape(Line(2,vertices, RED,5f))
+                requestRender();
+            }
         }
 
         return true

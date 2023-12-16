@@ -67,28 +67,16 @@
         app:layout_constraintStart_toStartOf="parent">
 
         <ImageButton
-            android:id="@+id/btn_add"
+            android:id="@+id/btn_draw"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:layout_weight="1"
             android:background="@drawable/btn_primary"
-            android:contentDescription="add to generative shape"
+            android:contentDescription="draw shapes"
             android:padding="10dp"
             android:scaleType="fitCenter"
             android:src="@mipmap/paint_brush" />
-
-        <ImageButton
-            android:id="@+id/btn_shape"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:layout_weight="1"
-            android:background="@drawable/btn_primary"
-            android:contentDescription="generate result"
-            android:padding="10dp"
-            android:scaleType="fitCenter"
-            android:src="@mipmap/shapes" />
 
         <ImageButton
             android:id="@+id/btn_colors"
@@ -102,17 +90,19 @@
             android:scaleType="fitCenter"
             android:src="@mipmap/color_wheel" />
 
+
+
         <ImageButton
-            android:id="@+id/btn_generate"
+            android:id="@+id/btn_cyclo"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:layout_weight="1"
             android:background="@drawable/btn_primary"
-            android:contentDescription="generate"
+            android:contentDescription="generate cyclograph"
             android:padding="10dp"
             android:scaleType="fitCenter"
-            android:src="@mipmap/save_instagram" />
+            android:src="@mipmap/right_arrow" />
     </LinearLayout>
 
 
