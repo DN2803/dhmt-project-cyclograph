@@ -9,6 +9,7 @@
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout2"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         app:layout_constraintStart_toStartOf="parent"
@@ -43,22 +44,18 @@
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <FrameLayout
-        android:id="@+id/frameLayout"
+    <com.cg76.drawingapp.GLESSurfaceView
+        android:id="@+id/glSurfaceView"
         android:layout_width="match_parent"
-        android:layout_height="600dp"
-        android:layout_marginTop="50dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="17dp"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout3"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <com.cg76.drawingapp.GLESSurfaceView
-            android:id="@+id/glSurfaceView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-    </FrameLayout>
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout2" />
 
     <LinearLayout
+        android:id="@+id/linearLayout3"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_marginBottom="15dp"
@@ -73,49 +70,49 @@
             android:id="@+id/btn_add"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_gravity="center"
             android:layout_weight="1"
-            android:padding="10dp"
             android:background="@drawable/btn_primary"
             android:contentDescription="add to generative shape"
-            android:src="@mipmap/paint_brush"
+            android:padding="10dp"
             android:scaleType="fitCenter"
-            android:layout_gravity="center"/>
+            android:src="@mipmap/paint_brush" />
 
         <ImageButton
             android:id="@+id/btn_shape"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_gravity="center"
             android:layout_weight="1"
-            android:padding="10dp"
             android:background="@drawable/btn_primary"
             android:contentDescription="generate result"
-            android:src="@mipmap/shapes"
+            android:padding="10dp"
             android:scaleType="fitCenter"
-            android:layout_gravity="center"/>
+            android:src="@mipmap/shapes" />
 
         <ImageButton
             android:id="@+id/btn_colors"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_gravity="center"
             android:layout_weight="1"
-            android:padding="10dp"
             android:background="@drawable/btn_primary"
             android:contentDescription="choose color to draw"
-            android:src="@mipmap/color_wheel"
+            android:padding="10dp"
             android:scaleType="fitCenter"
-            android:layout_gravity="center"/>
+            android:src="@mipmap/color_wheel" />
 
         <ImageButton
             android:id="@+id/btn_generate"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_gravity="center"
             android:layout_weight="1"
             android:background="@drawable/btn_primary"
             android:contentDescription="generate"
             android:padding="10dp"
-            android:layout_gravity="center"
-            android:src="@mipmap/save_instagram"
-            android:scaleType="fitCenter"/>
+            android:scaleType="fitCenter"
+            android:src="@mipmap/save_instagram" />
     </LinearLayout>
 
 
