@@ -48,61 +48,73 @@
         android:id="@+id/glSurfaceView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginBottom="17dp"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout3"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout2" />
 
+
     <LinearLayout
-        android:id="@+id/linearLayout3"
+        android:id="@+id/linearLayout"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginBottom="15dp"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <ImageButton
-            android:id="@+id/btn_draw"
+
+
+
+        <LinearLayout
+
+            android:id="@+id/navigate"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:layout_weight="1"
-            android:background="@drawable/btn_primary"
-            android:contentDescription="draw shapes"
-            android:padding="10dp"
-            android:scaleType="fitCenter"
-            android:src="@mipmap/paint_brush" />
+            android:layout_height="50dp"
+            android:layout_marginBottom="15dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:visibility="visible">
 
-        <ImageButton
-            android:id="@+id/btn_colors"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:layout_weight="1"
-            android:background="@drawable/btn_primary"
-            android:contentDescription="choose color to draw"
-            android:padding="10dp"
-            android:scaleType="fitCenter"
-            android:src="@mipmap/color_wheel" />
+            <ImageButton
+                android:id="@+id/btn_draw"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:background="@drawable/btn_primary"
+                android:contentDescription="draw shapes"
+                android:padding="10dp"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/paint_brush" />
+
+            <ImageButton
+                android:id="@+id/btn_colors"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:background="@drawable/btn_primary"
+                android:contentDescription="choose color to draw"
+                android:padding="10dp"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/color_wheel" />
 
 
-
-        <ImageButton
-            android:id="@+id/btn_cyclo"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:layout_weight="1"
-            android:background="@drawable/btn_primary"
-            android:contentDescription="generate cyclograph"
-            android:padding="10dp"
-            android:scaleType="fitCenter"
-            android:src="@mipmap/right_arrow" />
+            <ImageButton
+                android:id="@+id/btn_cyclo"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:background="@drawable/btn_primary"
+                android:contentDescription="generate cyclograph"
+                android:padding="10dp"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/right_arrow" />
+        </LinearLayout>
     </LinearLayout>
 
 

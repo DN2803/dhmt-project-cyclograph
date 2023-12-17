@@ -3,5 +3,6 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="gray">#4D87B2D5</color>
+    <color name="backgroundPopUp">#1A6F808E</color>
 
 </resources>

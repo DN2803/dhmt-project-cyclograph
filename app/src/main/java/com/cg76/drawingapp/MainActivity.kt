@@ -2,8 +2,11 @@ package com.cg76.drawingapp
 
 import android.app.Dialog
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.Gravity
+import android.view.View
 import android.widget.AbsSeekBar
 import android.widget.ImageButton
 import android.widget.LinearLayout
@@ -17,6 +20,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 class MainActivity : AppCompatActivity() {
     private lateinit var glSurfaceView: GLESSurfaceView
     private lateinit var colorPickerButton: ImageButton
+
     private val colorPopupBinding : ColorPopupBinding by lazy {
         ColorPopupBinding.inflate(layoutInflater)
 
@@ -27,16 +31,30 @@ class MainActivity : AppCompatActivity() {
 
         glSurfaceView = findViewById(R.id.glSurfaceView)
 
+
+        var navigateBTN = findViewById<LinearLayout>(R.id.navigate)
         colorPickerButton = findViewById<ImageButton>(R.id.btn_colors)
+
 
         val colorPopup = Dialog(this).apply {
             setContentView(colorPopupBinding.root)
+
             window!!.setLayout(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
+
+
             )
-            setCancelable(false)
+            // Set the X and Y position of the dialog
+            val layoutParams = window!!.attributes
+            layoutParams.gravity = Gravity.BOTTOM
+            layoutParams.dimAmount = 0.0f
+            window!!.setBackgroundDrawable(ColorDrawable(Color.argb(128, 0, 0, 0)))
+
+            setCancelable(true)
+
         }
+
         setOnSeekbar(
             "R",
             colorPopupBinding.redLayout.typeTxt,
@@ -55,11 +73,18 @@ class MainActivity : AppCompatActivity() {
             colorPopupBinding.blueLayout.seekBar,
             colorPopupBinding.blueLayout.colorValueTxt,
         )
-        colorPopupBinding.done.setOnClickListener {
+        colorPopupBinding.done.setOnClickListener{
+            //colorPopup.visibility = View.GONE
             colorPopup.dismiss()
+            val color = setRGBColor()
+            println(color);
+            navigateBTN.visibility = View.VISIBLE
         }
         colorPickerButton.setOnClickListener {
+            //colorPopup.visibility = View.VISIBLE
             colorPopup.show()
+            navigateBTN.visibility = View.GONE
+
         }
 
     }
