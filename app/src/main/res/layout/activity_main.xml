@@ -101,7 +101,17 @@
                 android:padding="10dp"
                 android:scaleType="fitCenter"
                 android:src="@mipmap/color_wheel" />
-
+            <ImageButton
+                android:id="@+id/btn_stroke"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:background="@drawable/btn_primary"
+                android:contentDescription="pick stroke"
+                android:padding="10dp"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/stroke" />
 
             <ImageButton
                 android:id="@+id/btn_cyclo"

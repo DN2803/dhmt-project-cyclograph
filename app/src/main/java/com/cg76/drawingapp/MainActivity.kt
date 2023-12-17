@@ -1,5 +1,6 @@
 package com.cg76.drawingapp
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -12,7 +13,12 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.SeekBar
 import android.widget.TextView
+import android.view.MotionEvent
+import android.view.animation.Animation
+import android.view.animation.ScaleAnimation
 import com.cg76.drawingapp.databinding.ColorPopupBinding
+import com.cg76.drawingapp.databinding.ShapePopupBinding
+import com.cg76.drawingapp.databinding.StrokePopupBinding
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
@@ -20,10 +26,20 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 class MainActivity : AppCompatActivity() {
     private lateinit var glSurfaceView: GLESSurfaceView
     private lateinit var colorPickerButton: ImageButton
+    private lateinit var shapePickerButton: ImageButton
+    private lateinit var strokePickerButton: ImageButton
+    private var shapeID: Int = 0
+        private set
+
 
     private val colorPopupBinding : ColorPopupBinding by lazy {
         ColorPopupBinding.inflate(layoutInflater)
-
+    }
+    private val shapePopupBinding : ShapePopupBinding by lazy {
+        ShapePopupBinding.inflate(layoutInflater)
+    }
+    private val strokePopupBinding : StrokePopupBinding by lazy {
+        StrokePopupBinding.inflate(layoutInflater)
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,9 +49,32 @@ class MainActivity : AppCompatActivity() {
 
 
         var navigateBTN = findViewById<LinearLayout>(R.id.navigate)
+        shapePickerButton =  findViewById<ImageButton>(R.id.btn_draw)
+        // pick shape type
+        val shapePopup = Dialog(this).apply {
+            setContentView(shapePopupBinding.root)
+
+            window!!.setLayout(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+
+
+            )
+            // Set the X and Y position of the dialog
+            val layoutParams = window!!.attributes
+            layoutParams.gravity = Gravity.BOTTOM
+            layoutParams.dimAmount = 0.0f
+            window!!.setBackgroundDrawable(ColorDrawable(Color.argb(0, 0, 0, 0)))
+
+
+            setCancelable(true)
+
+        }
+
+
         colorPickerButton = findViewById<ImageButton>(R.id.btn_colors)
 
-
+        // use to pick color
         val colorPopup = Dialog(this).apply {
             setContentView(colorPopupBinding.root)
 
@@ -50,6 +89,28 @@ class MainActivity : AppCompatActivity() {
             layoutParams.gravity = Gravity.BOTTOM
             layoutParams.dimAmount = 0.0f
             window!!.setBackgroundDrawable(ColorDrawable(Color.argb(128, 0, 0, 0)))
+
+            setCancelable(false)
+
+        }
+
+        strokePickerButton = findViewById<ImageButton>(R.id.btn_stroke)
+        // use to pick stroke
+        val strokePopup = Dialog(this).apply {
+            setContentView(strokePopupBinding.root)
+
+            window!!.setLayout(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+
+
+            )
+            // Set the X and Y position of the dialog
+            val layoutParams = window!!.attributes
+            layoutParams.gravity = Gravity.BOTTOM
+            layoutParams.dimAmount = 0.0f
+            window!!.setBackgroundDrawable(ColorDrawable(Color.argb(0, 0, 0, 0)))
+
 
             setCancelable(true)
 
@@ -73,6 +134,10 @@ class MainActivity : AppCompatActivity() {
             colorPopupBinding.blueLayout.seekBar,
             colorPopupBinding.blueLayout.colorValueTxt,
         )
+        setOnSeekbar(
+            strokePopupBinding.seekBar,
+            strokePopupBinding.ValueTxt,
+        )
         colorPopupBinding.done.setOnClickListener{
             //colorPopup.visibility = View.GONE
             colorPopup.dismiss()
@@ -86,7 +151,45 @@ class MainActivity : AppCompatActivity() {
             navigateBTN.visibility = View.GONE
 
         }
+        shapePickerButton.setOnClickListener{
 
+
+            shapePopup.show()
+            //navigateBTN.visibility = View.GONE
+            val shape = setShape()
+        }
+
+        shapePopupBinding.root.setOnClickListener{
+            shapePopup.dismiss()
+        }
+        strokePickerButton.setOnClickListener{
+            strokePopup.show()
+        }
+        strokePopupBinding.root.setOnClickListener{
+            strokePopup.dismiss()
+            val stroke = setStroke()
+
+        }
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun setShape(): Int {
+        shapePopupBinding.drawBrush.setOnTouchListener { view, motionEvent ->
+            handleTouchEvent(view, motionEvent, 1)
+        }
+        shapePopupBinding.drawLine.setOnTouchListener { view, motionEvent ->
+            handleTouchEvent(view, motionEvent, 2)
+        }
+        shapePopupBinding.drawCurve.setOnTouchListener { view, motionEvent ->
+            handleTouchEvent(view, motionEvent, 4)
+        }
+        shapePopupBinding.drawElipse.setOnTouchListener { view, motionEvent ->
+            handleTouchEvent(view, motionEvent, 364)
+        }
+        shapePopupBinding.drawPolygon.setOnTouchListener { view, motionEvent ->
+            handleTouchEvent(view, motionEvent, 3)
+        }
+        return shapeID
     }
 
     private fun setOnSeekbar(type: String, typeTxt: TextView, seekBar: SeekBar, colorTxt:TextView) {
@@ -123,7 +226,27 @@ class MainActivity : AppCompatActivity() {
         colorPopupBinding.viewColor.setBackgroundColor(Color.parseColor(hex))
         return color
     }
+    private fun setOnSeekbar(seekBar: SeekBar, value: TextView) {
+        seekBar.setOnSeekBarChangeListener(object :SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                if (seekBar != null) {
+                    value.text = seekBar.progress.toString()
+                }
+            }
 
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+
+            }
+        })
+    }
+    private fun setStroke(): Float {
+        val stroke = strokePopupBinding.seekBar.progress.toFloat()
+        return stroke
+    }
     override fun onPause() {
         super.onPause()
         glSurfaceView.onPause()
@@ -134,6 +257,45 @@ class MainActivity : AppCompatActivity() {
         glSurfaceView.onResume()
     }
 
+    private fun handleTouchEvent(view: View, motionEvent: MotionEvent, shapeIdentify: Int): Boolean {
+        when (motionEvent.action) {
+            MotionEvent.ACTION_DOWN -> {
+                // Animation for touch down (scale up)
+                scaleView(view, 1.0f, 1.2f)
+                this.shapeID = shapeIdentify
 
+
+            }
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                // Animation for touch up or touch cancel (scale back to normal)
+                scaleView(view, 1.2f, 1.0f)
+            }
+        }
+        return true
+    }
+
+    private fun scaleView(view: View, fromScale: Float, toScale: Float) {
+        val scaleAnimation = ScaleAnimation(
+            fromScale, toScale, fromScale, toScale,
+            Animation.RELATIVE_TO_SELF, 0.5f,
+            Animation.RELATIVE_TO_SELF, 0.5f
+        )
+
+        scaleAnimation.duration = 200 // Set the duration of the animation in milliseconds
+
+        // Set the animation listener to reset the view after the animation ends
+        scaleAnimation.setAnimationListener(object : Animation.AnimationListener {
+            override fun onAnimationStart(animation: Animation?) {}
+            override fun onAnimationEnd(animation: Animation?) {
+                // Reset the scale after the animation ends
+                view.clearAnimation()
+            }
+
+            override fun onAnimationRepeat(animation: Animation?) {}
+        })
+
+        // Start the animation
+        view.startAnimation(scaleAnimation)
+    }
 
 }
