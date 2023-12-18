@@ -16,13 +16,13 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageButton
-            android:id="@+id/btn_menu"
+            android:id="@+id/btn_affine"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:autofillHints="menu"
             android:background="@drawable/btn_primary"
-            android:contentDescription="Choose_Fractal_Or_Cyclo-graph"
+            android:contentDescription="Choose_Affine"
             android:scaleType="fitEnd"
             android:src="@drawable/baseline_menu_24"
             app:layout_constraintStart_toStartOf="parent"

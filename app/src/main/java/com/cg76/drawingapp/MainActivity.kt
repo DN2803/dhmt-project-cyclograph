@@ -16,8 +16,12 @@ import android.widget.TextView
 import android.view.MotionEvent
 import android.view.animation.Animation
 import android.view.animation.ScaleAnimation
+import android.widget.CheckBox
+import com.cg76.drawingapp.Shape.AffineType
 import com.cg76.drawingapp.Shape.ShapeType
+import com.cg76.drawingapp.databinding.AffinePopupBinding
 import com.cg76.drawingapp.databinding.ColorPopupBinding
+import com.cg76.drawingapp.databinding.GenerCycloPopupBinding
 import com.cg76.drawingapp.databinding.ShapePopupBinding
 import com.cg76.drawingapp.databinding.StrokePopupBinding
 
@@ -25,13 +29,17 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 
 class MainActivity : AppCompatActivity() {
+    lateinit var shapeID: ShapeType
+    var stroke: Float = 1f
+    var color = floatArrayOf(0f, 0f, 0f, 0f)
+    var copies: Int  = 0
+    lateinit var affineID: AffineType
     private lateinit var glSurfaceView: GLESSurfaceView
     private lateinit var colorPickerButton: ImageButton
     private lateinit var shapePickerButton: ImageButton
     private lateinit var strokePickerButton: ImageButton
-    lateinit var shapeID: ShapeType
-    var stroke: Float = 1f
-    var color = floatArrayOf(0f, 0f, 0f, 0f)
+    private lateinit var GenerateButton: ImageButton
+    private lateinit var affinePickerButton: ImageButton
 
 
 
@@ -47,6 +55,12 @@ class MainActivity : AppCompatActivity() {
     }
     private val strokePopupBinding : StrokePopupBinding by lazy {
         StrokePopupBinding.inflate(layoutInflater)
+    }
+    private val generCycloPopupBinding : GenerCycloPopupBinding by lazy {
+        GenerCycloPopupBinding.inflate(layoutInflater)
+    }
+    private val affinePopupBinding : AffinePopupBinding by lazy {
+        AffinePopupBinding.inflate(layoutInflater)
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -123,6 +137,48 @@ class MainActivity : AppCompatActivity() {
 
         }
 
+        GenerateButton = findViewById<ImageButton>(R.id.btn_cyclo)
+        val generPopup = Dialog(this).apply {
+            setContentView(generCycloPopupBinding.root)
+
+            window!!.setLayout(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+
+
+            )
+            // Set the X and Y position of the dialog
+            val layoutParams = window!!.attributes
+            layoutParams.gravity = Gravity.BOTTOM
+            layoutParams.dimAmount = 0.0f
+            window!!.setBackgroundDrawable(ColorDrawable(Color.argb(0, 0, 0, 0)))
+
+
+            setCancelable(false)
+
+        }
+        affinePickerButton = findViewById<ImageButton>(R.id.btn_affine)
+
+        val affinePopup = Dialog(this).apply {
+            setContentView(affinePopupBinding.root)
+
+            window!!.setLayout(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+
+
+            )
+            // Set the X and Y position of the dialog
+            val layoutParams = window!!.attributes
+            layoutParams.gravity = Gravity.TOP
+            layoutParams.dimAmount = 0.0f
+            window!!.setBackgroundDrawable(ColorDrawable(Color.argb(0, 0, 0, 0)))
+
+
+            setCancelable(true)
+
+        }
+
         setOnSeekbar(
             "R",
             colorPopupBinding.redLayout.typeTxt,
@@ -150,6 +206,10 @@ class MainActivity : AppCompatActivity() {
         setOnSeekbar(
             strokePopupBinding.seekBar,
             strokePopupBinding.ValueTxt,
+        )
+        setOnSeekbar(
+            generCycloPopupBinding.seekBar,
+            generCycloPopupBinding.ValueTxt,
         )
         colorPopupBinding.done.setOnClickListener{
             //colorPopup.visibility = View.GONE
@@ -184,6 +244,56 @@ class MainActivity : AppCompatActivity() {
             println(stroke)
 
         }
+        GenerateButton.setOnClickListener{
+            generPopup.show()
+        }
+        generCycloPopupBinding.apply.setOnClickListener{
+
+            copies = setCopies()
+            // call redraw
+            generPopup.dismiss()
+        }
+        affinePickerButton.setOnClickListener{
+            affinePopup.show()
+
+        }
+        affinePopupBinding.root.setOnClickListener{
+
+            generPopup.dismiss()
+            setAffine()
+            println(affineID)
+        }
+    }
+
+    private fun setAffine() {
+        //val checkBox = findViewById<CheckBox>(R.id.use2finger)
+
+        affineID = AffineType.NONE
+        if (!affinePopupBinding.use2finger.isChecked) {
+            println ("not checked")
+
+            affinePopupBinding.scale.setOnTouchListener { view, motionEvent ->
+                handleTouchEvent(view, motionEvent, AffineType.SCALE)
+            }
+            affinePopupBinding.translate.setOnTouchListener { view, motionEvent ->
+                handleTouchEvent(view, motionEvent, AffineType.TRANSLATE)
+            }
+            affinePopupBinding.shear.setOnTouchListener { view, motionEvent ->
+                handleTouchEvent(view, motionEvent, AffineType.SHEAR)
+            }
+            affinePopupBinding.rolate.setOnTouchListener { view, motionEvent ->
+                handleTouchEvent(view, motionEvent, AffineType.ROLATE)
+            }
+            affinePopupBinding.mirror.setOnTouchListener { view, motionEvent ->
+                handleTouchEvent(view, motionEvent, AffineType.MIRROR)
+            }
+        }
+
+    }
+
+    private fun setCopies(): Int {
+        val _copies = generCycloPopupBinding.seekBar.progress.toInt()
+        return _copies
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -199,6 +309,9 @@ class MainActivity : AppCompatActivity() {
         }
         shapePopupBinding.drawElipse.setOnTouchListener { view, motionEvent ->
             handleTouchEvent(view, motionEvent, ShapeType.ELIPSE)
+        }
+        shapePopupBinding.drawCricle.setOnTouchListener { view, motionEvent ->
+            handleTouchEvent(view, motionEvent, ShapeType.CIRCLE)
         }
         shapePopupBinding.drawPolygon.setOnTouchListener { view, motionEvent ->
             handleTouchEvent(view, motionEvent, ShapeType.TRIANGLE)
@@ -281,6 +394,22 @@ class MainActivity : AppCompatActivity() {
                 // Animation for touch down (scale up)
                 scaleView(view, 1.0f, 1.2f)
                 this.shapeID = shapeIdentify
+
+
+            }
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                // Animation for touch up or touch cancel (scale back to normal)
+                scaleView(view, 1.2f, 1.0f)
+            }
+        }
+        return true
+    }
+    private fun handleTouchEvent(view: View, motionEvent: MotionEvent, affineIdentify: AffineType): Boolean {
+        when (motionEvent.action) {
+            MotionEvent.ACTION_DOWN -> {
+                // Animation for touch down (scale up)
+                scaleView(view, 1.0f, 1.2f)
+                this.affineID = affineIdentify
 
 
             }

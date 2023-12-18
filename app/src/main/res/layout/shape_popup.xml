@@ -48,6 +48,12 @@
             android:src="@mipmap/line" />
 
 
+        <ImageView
+            android:id="@+id/draw_cricle"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_weight="4"
+            android:src="@mipmap/elips" />
 
         <ImageView
             android:id="@+id/draw_elipse"
@@ -55,6 +61,7 @@
             android:layout_height="25dp"
             android:layout_weight="4"
             android:src="@mipmap/elips" />
+
 
 
 

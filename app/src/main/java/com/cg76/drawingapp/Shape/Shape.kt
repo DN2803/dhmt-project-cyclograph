@@ -14,6 +14,9 @@ val BLACK = floatArrayOf(0f,0f,0f,1f)
 enum class ShapeType{
     BRUSH, LINE, TRIANGLE, SQUARE, CIRCLE, ELIPSE, CURVE
 }
+enum class AffineType{
+    NONE, SCALE, ROLATE, TRANSLATE, MIRROR, SHEAR
+}
 abstract class Shape(
     protected var _vertexCount: Int,
     protected var _vertices: MutableList<Vertex> = mutableListOf<Vertex>(),

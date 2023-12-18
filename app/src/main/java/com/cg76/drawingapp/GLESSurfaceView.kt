@@ -29,6 +29,8 @@ class GLESSurfaceView @JvmOverloads constructor(
 
         factory.registerWith(ShapeType.LINE, LineBuilder())
         factory.registerWith(ShapeType.TRIANGLE, TriangleBuilder())
+        factory.registerWith(ShapeType.ELIPSE, ElipseBuilder())
+        factory.registerWith(ShapeType.CIRCLE, CircleBuilder())
     }
 
     private val TOUCH_SCALE_FACTOR: Float = 0.1f
@@ -44,7 +46,7 @@ class GLESSurfaceView @JvmOverloads constructor(
 
     companion object{
         var color = floatArrayOf(0f, 0f, 0f, 0f)
-        var size = 15f
+        var size = 5f
     }
 
 
@@ -99,7 +101,7 @@ class GLESSurfaceView @JvmOverloads constructor(
             MotionEvent.ACTION_UP -> {
                 endPoint = floatArrayOf(e.x, e.y)
 
-                var builder = factory.select(ShapeType.LINE)
+                var builder = factory.select(ShapeType.ELIPSE)
                 var shape = builder?.build(startPoint,endPoint, color, size)
 
                 queueEvent { renderer.addShape(shape) }
