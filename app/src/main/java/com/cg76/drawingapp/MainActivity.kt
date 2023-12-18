@@ -32,6 +32,10 @@ class MainActivity : AppCompatActivity() {
         private set
 
 
+    companion object{
+
+    }
+
     private val colorPopupBinding : ColorPopupBinding by lazy {
         ColorPopupBinding.inflate(layoutInflater)
     }

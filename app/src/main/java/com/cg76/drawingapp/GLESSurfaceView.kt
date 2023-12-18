@@ -12,6 +12,8 @@ class GLESSurfaceView @JvmOverloads constructor(
 ) : GLSurfaceView(context, attrs) {
     private lateinit var renderer: GLESRenderer
 
+    private var factory = BuilderFactory()
+
     init {
         // Create an OpenGL ES 2.0 context
         setEGLContextClientVersion(2)
@@ -23,6 +25,10 @@ class GLESSurfaceView @JvmOverloads constructor(
 
         // Render the view only when there is a change in the drawing data
         renderMode = RENDERMODE_WHEN_DIRTY
+
+
+        factory.registerWith(ShapeType.LINE, LineBuilder())
+        factory.registerWith(ShapeType.TRIANGLE, TriangleBuilder())
     }
 
     private val TOUCH_SCALE_FACTOR: Float = 0.1f
@@ -33,28 +39,24 @@ class GLESSurfaceView @JvmOverloads constructor(
     private var previousY2: Float = 0f
 
     private var vertices = mutableListOf<Vertex>(Vertex(), Vertex())
-    companion object{ var maxXCoord: Float = 0f}
+    private lateinit var startPoint: FloatArray
+    private lateinit var endPoint: FloatArray
 
+    companion object{
+        var color = floatArrayOf(0f, 0f, 0f, 0f)
+        var size = 15f
+    }
+
+
+    // factory here
     override fun onTouchEvent(e: MotionEvent): Boolean {
+
         val pointerCount = e.pointerCount
 
         when (e.action and MotionEvent.ACTION_MASK) {
             MotionEvent.ACTION_DOWN -> {
                 // Chạm một ngón tay
-                previousX1 = e.getX(0)
-                previousY1 = e.getY(0)
-
-                // K = width/height
-                // x' = 0-> x = -K
-                // x' = width/2 -> x = 0
-                // x' = width -> x = K
-
-                // x = ((x')/height)*2 - width/height
-
-                val x1 = (previousX1 / height) * 2 - maxXCoord
-                val y1 = 1 - 2 * (previousY1 / this.height)
-
-                vertices[0] = Vertex(x1,y1)
+                startPoint = floatArrayOf(e.x, e.y)
                 performClick()
             }
 
@@ -95,16 +97,12 @@ class GLESSurfaceView @JvmOverloads constructor(
             }
 
             MotionEvent.ACTION_UP -> {
-                var x2 = e.getX(0)
-                var y2 = e.getY(0)
+                endPoint = floatArrayOf(e.x, e.y)
 
-                x2 = (x2 / height) * 2 - maxXCoord
-                y2 = 1 - 2 * (y2 / this.height)
+                var builder = factory.select(ShapeType.LINE)
+                var shape = builder?.build(startPoint,endPoint, color, size)
 
-                vertices[1] = Vertex(x2,y2)
-                val mLine = Line(2,vertices,BLACK,20f)
-
-                queueEvent { renderer.addShape(mLine) }
+                queueEvent { renderer.addShape(shape) }
                 requestRender()
             }
         }

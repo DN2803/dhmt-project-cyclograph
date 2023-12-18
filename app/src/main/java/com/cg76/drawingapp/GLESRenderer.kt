@@ -5,15 +5,17 @@ import javax.microedition.khronos.opengles.GL10
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.opengl.Matrix
-import com.cg76.drawingapp.GLESSurfaceView.Companion.maxXCoord
 import com.cg76.drawingapp.Shape.*
 
 class GLESRenderer: GLSurfaceView.Renderer {
 
     private var shapes = mutableListOf<Shape>()
-    fun addShape(shape: Shape){
-        shape.createProgram()
-        shapes.add(shape)
+
+    fun addShape(shape: Shape?){
+        if (shape != null) {
+            shape.createProgram()
+            shapes.add(shape)
+        }
     }
 
     override fun onSurfaceCreated(unused: GL10, config: EGLConfig) {
@@ -61,6 +63,12 @@ class GLESRenderer: GLSurfaceView.Renderer {
         }
     }
 
+    companion object{
+        var maxXCoord: Float = 0f
+        var viewWidth: Int = 0
+        var viewHeight: Int = 0
+    }
+
     override fun onSurfaceChanged(unused: GL10, width: Int, height: Int) {
         GLES20.glViewport(0, 0, width, height)
 
@@ -68,7 +76,10 @@ class GLESRenderer: GLSurfaceView.Renderer {
         // this projection matrix is applied to object coordinates
         // in the onDrawFrame() method
         Matrix.frustumM(projectionMatrix, 0, -ratio, ratio, -1f, 1f, 3f, 7f)
+
         maxXCoord = ratio
+        viewWidth = width
+        viewHeight = height
     }
 }
 

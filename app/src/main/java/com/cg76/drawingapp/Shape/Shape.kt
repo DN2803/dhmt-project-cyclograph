@@ -11,11 +11,14 @@ val GREEN = floatArrayOf(0f,1f,0f,1f)
 val BLUE = floatArrayOf(0f,0f,1f,1f)
 val BLACK = floatArrayOf(0f,0f,0f,1f)
 
+enum class ShapeType{
+    LINE, TRIANGLE, SQUARE, CIRCLE
+}
 abstract class Shape(
     protected var _vertexCount: Int,
     protected var _vertices: MutableList<Vertex> = mutableListOf<Vertex>(),
     protected var _color: FloatArray = FloatArray(16),
-    protected var _size: Float = 10f,
+    protected var _size: Float,
 ) : Drawable {
     protected abstract var _drawMode: Int
 
@@ -31,15 +34,15 @@ abstract class Shape(
         get() = _drawMode
         set(drawMode){ _drawMode = drawMode }
 
-    private companion object{
-        const val vertexShaderCode =
+    companion object{
+        private const val vertexShaderCode =
             "uniform mat4 uMVPMatrix;" +
                     "attribute vec4 vPosition;" +
                     "void main() {" +
                     "  gl_Position = uMVPMatrix * vPosition;" +
                     "}"
 
-        const val fragmentShaderCode =
+        private const val fragmentShaderCode =
             "precision mediump float;" +
                     "uniform vec4 vColor;" +
                     "void main() {" +
@@ -140,5 +143,4 @@ abstract class Shape(
             GLES20.glDisableVertexAttribArray(it)
         }
     }
-
 }
