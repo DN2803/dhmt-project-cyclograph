@@ -95,7 +95,7 @@ class MainActivity : AppCompatActivity() {
             val layoutParams = window!!.attributes
             layoutParams.gravity = Gravity.BOTTOM
             layoutParams.dimAmount = 0.0f
-            window!!.setBackgroundDrawable(ColorDrawable(Color.argb(128, 0, 0, 0)))
+            window!!.setBackgroundDrawable(ColorDrawable(Color.argb(0, 0, 0, 0)))
 
             setCancelable(false)
 
@@ -142,6 +142,12 @@ class MainActivity : AppCompatActivity() {
             colorPopupBinding.blueLayout.colorValueTxt,
         )
         setOnSeekbar(
+            "A",
+            colorPopupBinding.alphaLayout.typeTxt,
+            colorPopupBinding.alphaLayout.seekBar,
+            colorPopupBinding.alphaLayout.colorValueTxt,
+        )
+        setOnSeekbar(
             strokePopupBinding.seekBar,
             strokePopupBinding.ValueTxt,
         )
@@ -166,8 +172,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         shapePopupBinding.root.setOnClickListener{
-            setShape()
             shapePopup.dismiss()
+            setShape()
         }
         strokePickerButton.setOnClickListener{
             strokePopup.show()
@@ -181,7 +187,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    private fun setShape(): ShapeType {
+    private fun setShape() {
         shapePopupBinding.drawBrush.setOnTouchListener { view, motionEvent ->
             handleTouchEvent(view, motionEvent, ShapeType.BRUSH)
         }
@@ -197,7 +203,7 @@ class MainActivity : AppCompatActivity() {
         shapePopupBinding.drawPolygon.setOnTouchListener { view, motionEvent ->
             handleTouchEvent(view, motionEvent, ShapeType.TRIANGLE)
         }
-        return shapeID
+
     }
 
     private fun setOnSeekbar(type: String, typeTxt: TextView, seekBar: SeekBar, colorTxt:TextView) {
@@ -223,13 +229,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setRGBColor(){
-        color = floatArrayOf(colorPopupBinding.redLayout.seekBar.progress.toFloat()/256,
-            colorPopupBinding.greenLayout.seekBar.progress.toFloat()/256,colorPopupBinding.blueLayout.seekBar.progress.toFloat()/256)
+        color = floatArrayOf(
+            colorPopupBinding.redLayout.seekBar.progress.toFloat()/255,
+            colorPopupBinding.greenLayout.seekBar.progress.toFloat()/255,
+            colorPopupBinding.blueLayout.seekBar.progress.toFloat()/255,
+            colorPopupBinding.alphaLayout.seekBar.progress.toFloat()/255)
         val hex = String.format(
-            "#%02x%02x%02x",
+            "#%02x%02x%02x%02x",
+            colorPopupBinding.alphaLayout.seekBar.progress,
             colorPopupBinding.redLayout.seekBar.progress,
             colorPopupBinding.greenLayout.seekBar.progress,
-            colorPopupBinding.blueLayout.seekBar.progress
+            colorPopupBinding.blueLayout.seekBar.progress,
+
         )
         colorPopupBinding.viewColor.setBackgroundColor(Color.parseColor(hex))
 

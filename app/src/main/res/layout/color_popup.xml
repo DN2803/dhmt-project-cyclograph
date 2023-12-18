@@ -38,6 +38,8 @@
             android:id="@+id/greenLayout"/>
         <include layout="@layout/colot_popup_item"
             android:id="@+id/blueLayout"/>
+        <include layout="@layout/colot_popup_item"
+            android:id="@+id/alphaLayout"/>
 
     </LinearLayout>
 
