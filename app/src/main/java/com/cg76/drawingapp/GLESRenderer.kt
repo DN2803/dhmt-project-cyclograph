@@ -5,40 +5,28 @@ import javax.microedition.khronos.opengles.GL10
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.opengl.Matrix
-import android.os.SystemClock
+import com.cg76.drawingapp.GLESSurfaceView.Companion.maxXCoord
 import com.cg76.drawingapp.Shape.*
 
 class GLESRenderer: GLSurfaceView.Renderer {
-    private var shapes = mutableListOf<Shape>()
 
+    private var shapes = mutableListOf<Shape>()
     fun addShape(shape: Shape){
+        shape.createProgram()
         shapes.add(shape)
     }
 
     override fun onSurfaceCreated(unused: GL10, config: EGLConfig) {
         // Set the background frame color
         GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f)
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
+        var tVertices = mutableListOf<Vertex>()
+        tVertices.add(Vertex(0.0f, 1f, 0.0f))
+        tVertices.add(Vertex(-1080/1640f, -1f, 0.0f))
+        tVertices.add(Vertex(1080/1640f, -1f, 0.0f))
+        var mTriangle = Triangle(3,tVertices, RED,15f)
 
-//        var lVertices = mutableListOf<Vertex>()
-//        lVertices.add(Vertex(-0.5f, -0.6708927f, 0.0f))
-//        lVertices.add(Vertex(0.5f, 0.603135f, 0.0f))//
-//        var mLine = Line(2, lVertices, BLACK, 20f)
-
-//        var tVertices = mutableListOf<Vertex>()
-//        tVertices.add(Vertex(0.0f, 0.75f, 0.0f))
-//        tVertices.add(Vertex(-0.5f, -0.5f, 0.0f))
-//        tVertices.add(Vertex(0.5f, -0.5f, 0.0f))
-//        var mTriangle = Triangle(3,tVertices, RED,15f)
-
-//        shapes.add(mLine)
-//        shapes.add(mTriangle)
-
-
-//        var cVertices = mutableListOf<Vertex>()
-//
-//        var mCircle = Circle(364, cVertices, RED, 10f)
-//        mCircle.setPossition(0f, 0f, 0.5f, 0.6f)
-//        shapes.add(mCircle)
+        this.addShape(mTriangle)
     }
 
     // vPMatrix is an abbreviation for "Model View Projection Matrix"
@@ -53,7 +41,7 @@ class GLESRenderer: GLSurfaceView.Renderer {
         val scratch = FloatArray(16)
 
         // Redraw background color
-        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
+        //GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
 
         // Set the camera position (View matrix)
         Matrix.setLookAtM(viewMatrix, 0, 0f, 0f, 3f, 0f, 0f, 0f, 0f, 1.0f, 0.0f)
@@ -61,14 +49,11 @@ class GLESRenderer: GLSurfaceView.Renderer {
         // Calculate the projection and view transformation
         Matrix.multiplyMM(vPMatrix, 0, projectionMatrix, 0, viewMatrix, 0)
 
-//        // Create a rotation transformation for the triangle
-//        val time = SystemClock.uptimeMillis() % 4000L
-//        val angle = 0.090f * time.toInt()
         Matrix.setRotateM(rotationMatrix, 0, angle, 0f, 0f, -1.0f)
-//
-//        // Combine the rotation matrix with the projection and camera view
-//        // Note that the vPMatrix factor *must be first* in order
-//        // for the matrix multiplication product to be correct.
+
+        // Combine the rotation matrix with the projection and camera view
+        // Note that the vPMatrix factor *must be first* in order
+        // for the matrix multiplication product to be correct.
         Matrix.multiplyMM(scratch, 0, vPMatrix, 0, rotationMatrix, 0)
 
         for(shape in shapes){
@@ -83,17 +68,15 @@ class GLESRenderer: GLSurfaceView.Renderer {
         // this projection matrix is applied to object coordinates
         // in the onDrawFrame() method
         Matrix.frustumM(projectionMatrix, 0, -ratio, ratio, -1f, 1f, 3f, 7f)
+        maxXCoord = ratio
     }
 }
 
 fun loadShader(type: Int, shaderCode: String): Int {
+    val shader = GLES20.glCreateShader(type)
 
-    // create a vertex shader type (GLES20.GL_VERTEX_SHADER)
-    // or a fragment shader type (GLES20.GL_FRAGMENT_SHADER)
-    return GLES20.glCreateShader(type).also { shader ->
+    GLES20.glShaderSource(shader, shaderCode)
+    GLES20.glCompileShader(shader)
 
-        // add the source code to the shader and compile it
-        GLES20.glShaderSource(shader, shaderCode)
-        GLES20.glCompileShader(shader)
-    }
+    return shader
 }

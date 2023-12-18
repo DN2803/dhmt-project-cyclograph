@@ -21,48 +21,47 @@ abstract class Shape(
 
     var color: FloatArray
         get() = _color
-        set(rgba: FloatArray){ _color = rgba}
+        set(color){ _color = color}
 
     var size: Float
         get() = _size
-        set(size: Float) {_size = size}
+        set(size) {_size = size}
 
     var drawMode: Int
         get() = _drawMode
-        set(drawMode: Int){ _drawMode = drawMode }
+        set(drawMode){ _drawMode = drawMode }
 
+    private companion object{
+        const val vertexShaderCode =
+            "uniform mat4 uMVPMatrix;" +
+                    "attribute vec4 vPosition;" +
+                    "void main() {" +
+                    "  gl_Position = uMVPMatrix * vPosition;" +
+                    "}"
 
-    // Define Shaders
-    private val vertexShaderCode =
-        "uniform mat4 uMVPMatrix;" +
-                "attribute vec4 vPosition;" +
-                "void main() {" +
-                "  gl_Position = uMVPMatrix * vPosition;" +
-                "}"
-
-    private val fragmentShaderCode =
-        "precision mediump float;" +
-                "uniform vec4 vColor;" +
-                "void main() {" +
-                "  gl_FragColor = vColor;" +
-                "}"
+        const val fragmentShaderCode =
+            "precision mediump float;" +
+                    "uniform vec4 vColor;" +
+                    "void main() {" +
+                    "  gl_FragColor = vColor;" +
+                    "}"
+    }
 
     // Use to access and set the view transformation
     private var vPMatrixHandle: Int = 0
 
     // Compile shader code and add them to a OpenGL ES program object
     // and then link the program
-    private var mProgram: Int
+    private var mProgram: Int = 0
 
-    init {
+    fun createProgram() {   // call in GLESRenderer's methods
         val vertexShader: Int = loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode)
         val fragmentShader: Int = loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode)
 
         // create empty OpenGL ES Program
         mProgram = GLES20.glCreateProgram().also {
-            // add the vertex shader to program
+            // add the vertex shader & fragment shader to program
             GLES20.glAttachShader(it, vertexShader)
-            // add the fragment shader to program
             GLES20.glAttachShader(it, fragmentShader)
             // creates OpenGL ES program executables
             GLES20.glLinkProgram(it)
