@@ -16,6 +16,7 @@ import android.widget.TextView
 import android.view.MotionEvent
 import android.view.animation.Animation
 import android.view.animation.ScaleAnimation
+import com.cg76.drawingapp.Shape.ShapeType
 import com.cg76.drawingapp.databinding.ColorPopupBinding
 import com.cg76.drawingapp.databinding.ShapePopupBinding
 import com.cg76.drawingapp.databinding.StrokePopupBinding
@@ -28,8 +29,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var colorPickerButton: ImageButton
     private lateinit var shapePickerButton: ImageButton
     private lateinit var strokePickerButton: ImageButton
-    private var shapeID: Int = 0
-        private set
+    lateinit var shapeID: ShapeType
+    var stroke: Float = 1f
+    var color = floatArrayOf(0f, 0f, 0f, 0f)
+
 
 
     companion object{
@@ -145,7 +148,7 @@ class MainActivity : AppCompatActivity() {
         colorPopupBinding.done.setOnClickListener{
             //colorPopup.visibility = View.GONE
             colorPopup.dismiss()
-            val color = setRGBColor()
+            //val color = setRGBColor()
             println(color);
             navigateBTN.visibility = View.VISIBLE
         }
@@ -160,10 +163,10 @@ class MainActivity : AppCompatActivity() {
 
             shapePopup.show()
             //navigateBTN.visibility = View.GONE
-            val shape = setShape()
         }
 
         shapePopupBinding.root.setOnClickListener{
+            setShape()
             shapePopup.dismiss()
         }
         strokePickerButton.setOnClickListener{
@@ -171,27 +174,28 @@ class MainActivity : AppCompatActivity() {
         }
         strokePopupBinding.root.setOnClickListener{
             strokePopup.dismiss()
-            val stroke = setStroke()
+            setStroke()
+            println(stroke)
 
         }
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    private fun setShape(): Int {
+    private fun setShape(): ShapeType {
         shapePopupBinding.drawBrush.setOnTouchListener { view, motionEvent ->
-            handleTouchEvent(view, motionEvent, 1)
+            handleTouchEvent(view, motionEvent, ShapeType.BRUSH)
         }
         shapePopupBinding.drawLine.setOnTouchListener { view, motionEvent ->
-            handleTouchEvent(view, motionEvent, 2)
+            handleTouchEvent(view, motionEvent, ShapeType.LINE)
         }
         shapePopupBinding.drawCurve.setOnTouchListener { view, motionEvent ->
-            handleTouchEvent(view, motionEvent, 4)
+            handleTouchEvent(view, motionEvent, ShapeType.CURVE)
         }
         shapePopupBinding.drawElipse.setOnTouchListener { view, motionEvent ->
-            handleTouchEvent(view, motionEvent, 364)
+            handleTouchEvent(view, motionEvent, ShapeType.ELIPSE)
         }
         shapePopupBinding.drawPolygon.setOnTouchListener { view, motionEvent ->
-            handleTouchEvent(view, motionEvent, 3)
+            handleTouchEvent(view, motionEvent, ShapeType.TRIANGLE)
         }
         return shapeID
     }
@@ -218,8 +222,8 @@ class MainActivity : AppCompatActivity() {
         colorTxt.text = seekBar.progress.toString()
     }
 
-    private fun setRGBColor(): FloatArray {
-        val color = floatArrayOf(colorPopupBinding.redLayout.seekBar.progress.toFloat()/256,
+    private fun setRGBColor(){
+        color = floatArrayOf(colorPopupBinding.redLayout.seekBar.progress.toFloat()/256,
             colorPopupBinding.greenLayout.seekBar.progress.toFloat()/256,colorPopupBinding.blueLayout.seekBar.progress.toFloat()/256)
         val hex = String.format(
             "#%02x%02x%02x",
@@ -228,7 +232,7 @@ class MainActivity : AppCompatActivity() {
             colorPopupBinding.blueLayout.seekBar.progress
         )
         colorPopupBinding.viewColor.setBackgroundColor(Color.parseColor(hex))
-        return color
+
     }
     private fun setOnSeekbar(seekBar: SeekBar, value: TextView) {
         seekBar.setOnSeekBarChangeListener(object :SeekBar.OnSeekBarChangeListener {
@@ -247,9 +251,8 @@ class MainActivity : AppCompatActivity() {
             }
         })
     }
-    private fun setStroke(): Float {
-        val stroke = strokePopupBinding.seekBar.progress.toFloat()
-        return stroke
+    private fun setStroke(){
+        stroke = strokePopupBinding.seekBar.progress.toFloat()/100
     }
     override fun onPause() {
         super.onPause()
@@ -261,7 +264,7 @@ class MainActivity : AppCompatActivity() {
         glSurfaceView.onResume()
     }
 
-    private fun handleTouchEvent(view: View, motionEvent: MotionEvent, shapeIdentify: Int): Boolean {
+    private fun handleTouchEvent(view: View, motionEvent: MotionEvent, shapeIdentify: ShapeType): Boolean {
         when (motionEvent.action) {
             MotionEvent.ACTION_DOWN -> {
                 // Animation for touch down (scale up)

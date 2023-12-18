@@ -12,7 +12,7 @@ val BLUE = floatArrayOf(0f,0f,1f,1f)
 val BLACK = floatArrayOf(0f,0f,0f,1f)
 
 enum class ShapeType{
-    LINE, TRIANGLE, SQUARE, CIRCLE
+    BRUSH, LINE, TRIANGLE, SQUARE, CIRCLE, ELIPSE, CURVE
 }
 abstract class Shape(
     protected var _vertexCount: Int,

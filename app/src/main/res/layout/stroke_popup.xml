@@ -30,7 +30,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="6"
-            android:max="255"
+            android:max="100"
             android:min="1"
             android:progress="0" />
         <TextView
