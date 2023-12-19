@@ -8,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
-import android.widget.AbsSeekBar
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.SeekBar
@@ -16,8 +15,7 @@ import android.widget.TextView
 import android.view.MotionEvent
 import android.view.animation.Animation
 import android.view.animation.ScaleAnimation
-import android.widget.CheckBox
-import com.cg76.drawingapp.Shape.AffineType
+import com.cg76.drawingapp.Shape.ActionType
 import com.cg76.drawingapp.Shape.ShapeType
 import com.cg76.drawingapp.databinding.AffinePopupBinding
 import com.cg76.drawingapp.databinding.ColorPopupBinding
@@ -25,27 +23,25 @@ import com.cg76.drawingapp.databinding.GenerCycloPopupBinding
 import com.cg76.drawingapp.databinding.ShapePopupBinding
 import com.cg76.drawingapp.databinding.StrokePopupBinding
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 
 class MainActivity : AppCompatActivity() {
-    lateinit var shapeID: ShapeType
-    var stroke: Float = 1f
-    var color = floatArrayOf(0f, 0f, 0f, 0f)
-    var copies: Int  = 0
-    lateinit var affineID: AffineType
-    private lateinit var glSurfaceView: GLESSurfaceView
+    companion object{
+        var shapeType = ShapeType.LINE
+        var stroke: Float = 1f
+        var color = floatArrayOf(0f, 0f, 0f, 0f)
+        var copies: Int  = 0
+        var shapeID: Int = 0
+        var actionType = ActionType.DRAW
+        lateinit var glSurfaceView: GLESSurfaceView
+    }
+
     private lateinit var colorPickerButton: ImageButton
     private lateinit var shapePickerButton: ImageButton
     private lateinit var strokePickerButton: ImageButton
     private lateinit var GenerateButton: ImageButton
     private lateinit var affinePickerButton: ImageButton
 
-
-
-    companion object{
-
-    }
 
     private val colorPopupBinding : ColorPopupBinding by lazy {
         ColorPopupBinding.inflate(layoutInflater)
@@ -251,6 +247,9 @@ class MainActivity : AppCompatActivity() {
 
             copies = setCopies()
             // call redraw
+
+            glSurfaceView.genCycloGraph(copies)
+
             generPopup.dismiss()
         }
         affinePickerButton.setOnClickListener{
@@ -261,33 +260,34 @@ class MainActivity : AppCompatActivity() {
 
             generPopup.dismiss()
             setAffine()
-            println(affineID)
+            println(actionType)
         }
     }
 
     private fun setAffine() {
         //val checkBox = findViewById<CheckBox>(R.id.use2finger)
 
-        affineID = AffineType.NONE
-        if (!affinePopupBinding.use2finger.isChecked) {
+
+//        if (!affinePopupBinding.use2finger.isChecked) {
             println ("not checked")
 
             affinePopupBinding.scale.setOnTouchListener { view, motionEvent ->
-                handleTouchEvent(view, motionEvent, AffineType.SCALE)
+                handleTouchEvent(view, motionEvent, ActionType.SCALE)
             }
             affinePopupBinding.translate.setOnTouchListener { view, motionEvent ->
-                handleTouchEvent(view, motionEvent, AffineType.TRANSLATE)
+                handleTouchEvent(view, motionEvent, ActionType.TRANSLATE)
             }
             affinePopupBinding.shear.setOnTouchListener { view, motionEvent ->
-                handleTouchEvent(view, motionEvent, AffineType.SHEAR)
+                handleTouchEvent(view, motionEvent, ActionType.SHEAR)
             }
             affinePopupBinding.rolate.setOnTouchListener { view, motionEvent ->
-                handleTouchEvent(view, motionEvent, AffineType.ROLATE)
+                handleTouchEvent(view, motionEvent, ActionType.ROTATE)
             }
             affinePopupBinding.mirror.setOnTouchListener { view, motionEvent ->
-                handleTouchEvent(view, motionEvent, AffineType.MIRROR)
+                handleTouchEvent(view, motionEvent, ActionType.MIRROR)
             }
-        }
+
+
 
     }
 
@@ -388,13 +388,12 @@ class MainActivity : AppCompatActivity() {
         glSurfaceView.onResume()
     }
 
-    private fun handleTouchEvent(view: View, motionEvent: MotionEvent, shapeIdentify: ShapeType): Boolean {
+    private fun handleTouchEvent(view: View, motionEvent: MotionEvent, type: ShapeType): Boolean {
         when (motionEvent.action) {
             MotionEvent.ACTION_DOWN -> {
                 // Animation for touch down (scale up)
                 scaleView(view, 1.0f, 1.2f)
-                this.shapeID = shapeIdentify
-
+                shapeType = type
 
             }
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
@@ -404,12 +403,12 @@ class MainActivity : AppCompatActivity() {
         }
         return true
     }
-    private fun handleTouchEvent(view: View, motionEvent: MotionEvent, affineIdentify: AffineType): Boolean {
+    private fun handleTouchEvent(view: View, motionEvent: MotionEvent, type: ActionType): Boolean {
         when (motionEvent.action) {
             MotionEvent.ACTION_DOWN -> {
                 // Animation for touch down (scale up)
                 scaleView(view, 1.0f, 1.2f)
-                this.affineID = affineIdentify
+                actionType = type
 
 
             }

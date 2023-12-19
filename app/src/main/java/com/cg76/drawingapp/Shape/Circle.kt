@@ -11,8 +11,7 @@ class Circle: Shape{
 
 
     override var _drawMode = GLES20.GL_LINE_LOOP
-
-
+    override var _type = ShapeType.CIRCLE
 }
 fun setPossition (centerX: Float, centerY: Float, rx: Float, ry: Float): MutableList<Vertex>{
 
@@ -48,10 +47,18 @@ class CircleBuilder: ShapeBuilder{
 
         var vertices = setPossition(x1, y1, rx, rx)
         return Circle(364, vertices, color, size)
+    }
 
-
+    override fun build(
+        vertexCount: Int,
+        vertices: MutableList<Vertex>,
+        color: FloatArray,
+        size: Float
+    ): Shape {
+        return Circle(364, vertices, color, size)
     }
 }
+
 class ElipseBuilder: ShapeBuilder{
     override fun build(startPoint: FloatArray, endPoint: FloatArray, color: FloatArray, size: Float): Circle {
         // left
@@ -67,8 +74,16 @@ class ElipseBuilder: ShapeBuilder{
         var rx = x2-x1
         var ry = y2-y1
         var vertices = setPossition(x1, y1, rx, ry)
+
         return Circle(364, vertices, color, size)
+    }
 
-
+    override fun build(
+        vertexCount: Int,
+        vertices: MutableList<Vertex>,
+        color: FloatArray,
+        size: Float
+    ): Shape {
+        return Circle(364, vertices, color, size)
     }
 }

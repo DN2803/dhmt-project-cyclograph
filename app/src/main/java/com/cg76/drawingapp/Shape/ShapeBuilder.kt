@@ -6,4 +6,10 @@ interface ShapeBuilder {
         endPoint: FloatArray,
         color: FloatArray,
         size: Float): Shape
+
+    fun build(
+        vertexCount: Int,
+        vertices: MutableList<Vertex>,
+        color: FloatArray,
+        size: Float) : Shape
 }

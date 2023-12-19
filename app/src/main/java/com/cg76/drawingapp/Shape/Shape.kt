@@ -14,9 +14,11 @@ val BLACK = floatArrayOf(0f,0f,0f,1f)
 enum class ShapeType{
     BRUSH, LINE, TRIANGLE, SQUARE, CIRCLE, ELIPSE, CURVE
 }
-enum class AffineType{
-    NONE, SCALE, ROLATE, TRANSLATE, MIRROR, SHEAR
+
+enum class ActionType{
+     DRAW, SCALE, ROTATE, TRANSLATE, MIRROR, SHEAR
 }
+
 abstract class Shape(
     protected var _vertexCount: Int,
     protected var _vertices: MutableList<Vertex> = mutableListOf<Vertex>(),
@@ -24,6 +26,18 @@ abstract class Shape(
     protected var _size: Float,
 ) : Drawable {
     protected abstract var _drawMode: Int
+    private var _isTemp = false
+    private var _isClone = false
+    protected abstract var _type: ShapeType
+
+
+    var vertexCount: Int
+        get() = _vertexCount
+        set(vertexCount) {_vertexCount = vertexCount}
+
+    var vertices: MutableList<Vertex>
+        get() = _vertices
+        set(vertices) {_vertices = vertices}
 
     var color: FloatArray
         get() = _color
@@ -36,6 +50,18 @@ abstract class Shape(
     var drawMode: Int
         get() = _drawMode
         set(drawMode){ _drawMode = drawMode }
+
+    var isTemp: Boolean
+        get() = _isTemp
+        set(isTemp) {_isTemp = isTemp}
+
+    var isClone: Boolean
+        get() = _isClone
+        set(isClone) {_isClone = isClone}
+
+    var type: ShapeType
+        get() = _type
+        set(isClone) {_type = type}
 
     companion object{
         private const val vertexShaderCode =
@@ -100,7 +126,6 @@ abstract class Shape(
     private var positionHandle: Int = 0
     private var mColorHandle: Int = 0
 
-    private val vertexCount: Int = _vertexCount
     private val vertexStride: Int = Vertex.COORDS_PER_VERTEX * 4 // 4 bytes per vertex
 
     override fun draw(mvpMatrix: FloatArray, mode: Int) {
@@ -140,7 +165,7 @@ abstract class Shape(
 
             // Draw the shape
             GLES20.glLineWidth(_size)
-            GLES20.glDrawArrays(mode, 0, vertexCount)
+            GLES20.glDrawArrays(mode, 0, _vertexCount)
 
             // Disable vertex array
             GLES20.glDisableVertexAttribArray(it)

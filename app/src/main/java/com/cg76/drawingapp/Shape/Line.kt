@@ -10,7 +10,7 @@ class Line: Shape {
                 size: Float) : super(vertexCount, vertices, color, size)
 
     override var _drawMode = GLES20.GL_LINES
-
+    override var _type = ShapeType.LINE
 }
 
 class LineBuilder: ShapeBuilder{
@@ -21,6 +21,7 @@ class LineBuilder: ShapeBuilder{
         // x' = width -> x = K
         // -> x = ((x')/height)*2 - width/height
 
+
         val x1 = (startPoint[0] / viewHeight) * 2 - maxXCoord
         val y1 = 1 - 2 * (startPoint[1] / viewHeight)
 
@@ -29,5 +30,14 @@ class LineBuilder: ShapeBuilder{
 
         val vertices = mutableListOf(Vertex(x1,y1), Vertex(x2, y2))
         return Line(2, vertices, color, size)
+    }
+
+    override fun build(
+        vertexCount: Int,
+        vertices: MutableList<Vertex>,
+        color: FloatArray,
+        size: Float
+    ): Shape {
+        return Line(vertexCount,vertices,color,size)
     }
 }
