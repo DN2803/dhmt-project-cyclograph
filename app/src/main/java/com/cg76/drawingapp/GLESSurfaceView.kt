@@ -106,7 +106,7 @@ class GLESSurfaceView @JvmOverloads constructor(
     private var previousY: Float = 0f
 
     private fun affineTrans(e: MotionEvent, type: ActionType, shapeID: Int){
-        val transMatrixBuilder = TransMatrixBuilder()
+        //val transMatrixBuilder = TransMatrixBuilder()
         lateinit var transMatrix: FloatArray
 
         when (e.action) {
@@ -121,9 +121,9 @@ class GLESSurfaceView @JvmOverloads constructor(
                 if (x < width / 2) {
                     dy *= -1
                 }
-                transMatrix = transMatrixBuilder.build(ROTATE, dx, dy)
+                //transMatrix = transMatrixBuilder.build(ROTATE, dx, dy)
 
-                queueEvent() { renderer.updateShapeAt(transMatrix, shapeID)}
+                //queueEvent() { renderer.updateShapeAt(transMatrix, shapeID)}
 
                 requestRender()
             }
