@@ -45,8 +45,11 @@ class MainActivity : AppCompatActivity() {
             val newButton = Button(context)
 
             newButton.layoutParams = LinearLayout.LayoutParams(
-                layerList.width / 5,
-                LinearLayout.LayoutParams.MATCH_PARENT // height
+//                layerList.width / 5,
+//                LinearLayout.LayoutParams.MATCH_PARENT // height
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.MATCH_PARENT
+
             )
 
             buttonCount++
