@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Gravity
@@ -16,6 +17,7 @@ import android.view.MotionEvent
 import android.view.animation.Animation
 import android.view.animation.ScaleAnimation
 import android.widget.Button
+import androidx.annotation.RequiresApi
 import com.cg76.drawingapp.Shape.ActionType
 import com.cg76.drawingapp.Shape.ShapeType
 import com.cg76.drawingapp.databinding.AffinePopupBinding
@@ -28,41 +30,57 @@ import com.cg76.drawingapp.databinding.StrokePopupBinding
 
 class MainActivity : AppCompatActivity() {
 
-    companion object{
+    companion object {
+        var isDrawAction = false
         var shapeType = ShapeType.LINE
         var stroke: Float = 1f
         var color = floatArrayOf(0f, 0f, 0f, 0f)
-        var copies: Int  = 0
-        var shapeID: Int = 0
-        var actionType = ActionType.DRAW
+        var copies: Int = 0
         lateinit var glSurfaceView: GLESSurfaceView
-        lateinit var layerList: LinearLayout
-        var context: MainActivity? = null
 
-        var buttonCount = 0
+        var V_shift = 0
+        var H_shift = 0
+        var scale = 1f
+        var rotate = 0f
+        var V_sheer = 0f
+        var H_sheer = 0f
+
+        lateinit var layerList: LinearLayout
+        var activeList = mutableListOf<Boolean>()
+        var context: MainActivity? = null
+        private var buttonCount = 0
 
         fun addLayerButton() {
             val newButton = Button(context)
 
             newButton.layoutParams = LinearLayout.LayoutParams(
-//                layerList.width / 5,
-//                LinearLayout.LayoutParams.MATCH_PARENT // height
                 LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.MATCH_PARENT
-
+                LinearLayout.LayoutParams.MATCH_PARENT // height
             )
 
-            buttonCount++
+            activeList.add(false)
+
             newButton.id = buttonCount
+            buttonCount++
             newButton.text = "Layer $buttonCount"
+            newButton.setBackgroundColor(0xFFFFFFFF.toInt())
 
             newButton.setOnClickListener {
-                shapeID = buttonCount
+                val id = newButton.id
+                activeList[id] = !activeList[id]
+
+                if (activeList[id]) {
+                    newButton.setBackgroundColor(0xFFA9A9A9.toInt())
+                } else {
+                    newButton.setBackgroundColor(0xFFFFFFFF.toInt())
+                }
             }
 
             layerList.addView(newButton)
         }
     }
+
+    private val actionButtons = mutableListOf<ImageButton>()
 
     private lateinit var colorPickerButton: ImageButton
     private lateinit var shapePickerButton: ImageButton
@@ -70,22 +88,23 @@ class MainActivity : AppCompatActivity() {
     private lateinit var GenerateButton: ImageButton
     private lateinit var affinePickerButton: ImageButton
 
-    private val colorPopupBinding : ColorPopupBinding by lazy {
+    private val colorPopupBinding: ColorPopupBinding by lazy {
         ColorPopupBinding.inflate(layoutInflater)
     }
-    private val shapePopupBinding : ShapePopupBinding by lazy {
+    private val shapePopupBinding: ShapePopupBinding by lazy {
         ShapePopupBinding.inflate(layoutInflater)
     }
-    private val strokePopupBinding : StrokePopupBinding by lazy {
+    private val strokePopupBinding: StrokePopupBinding by lazy {
         StrokePopupBinding.inflate(layoutInflater)
     }
-    private val generCycloPopupBinding : GenerCycloPopupBinding by lazy {
+    private val generCycloPopupBinding: GenerCycloPopupBinding by lazy {
         GenerCycloPopupBinding.inflate(layoutInflater)
     }
-    private val affinePopupBinding : AffinePopupBinding by lazy {
+    private val affinePopupBinding: AffinePopupBinding by lazy {
         AffinePopupBinding.inflate(layoutInflater)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -96,7 +115,23 @@ class MainActivity : AppCompatActivity() {
         layerList = findViewById(R.id.layerList)
 
         var navigateBTN = findViewById<LinearLayout>(R.id.navigate)
-        shapePickerButton =  findViewById<ImageButton>(R.id.btn_draw)
+        shapePickerButton = findViewById<ImageButton>(R.id.btn_draw)
+        colorPickerButton = findViewById<ImageButton>(R.id.btn_colors)
+        strokePickerButton = findViewById<ImageButton>(R.id.btn_stroke)
+        GenerateButton = findViewById<ImageButton>(R.id.btn_cyclo)
+        affinePickerButton = findViewById<ImageButton>(R.id.btn_affine)
+        actionButtons.addAll(
+            listOf(
+                shapePickerButton,
+                colorPickerButton,
+                strokePickerButton,
+                GenerateButton,
+                affinePickerButton
+            )
+        )
+
+        onButtonClicked(shapePickerButton)
+        isDrawAction = true
 
         // pick shape type
         val shapePopup = Dialog(this).apply {
@@ -115,9 +150,6 @@ class MainActivity : AppCompatActivity() {
 
             setCancelable(true)
         }
-
-
-        colorPickerButton = findViewById<ImageButton>(R.id.btn_colors)
 
         // use to pick color
         val colorPopup = Dialog(this).apply {
@@ -139,7 +171,6 @@ class MainActivity : AppCompatActivity() {
 
         }
 
-        strokePickerButton = findViewById<ImageButton>(R.id.btn_stroke)
         // use to pick stroke
         val strokePopup = Dialog(this).apply {
             setContentView(strokePopupBinding.root)
@@ -161,7 +192,6 @@ class MainActivity : AppCompatActivity() {
 
         }
 
-        GenerateButton = findViewById<ImageButton>(R.id.btn_cyclo)
         val generPopup = Dialog(this).apply {
             setContentView(generCycloPopupBinding.root)
 
@@ -181,7 +211,6 @@ class MainActivity : AppCompatActivity() {
             setCancelable(false)
 
         }
-        affinePickerButton = findViewById<ImageButton>(R.id.btn_affine)
 
         val affinePopup = Dialog(this).apply {
             setContentView(affinePopupBinding.root)
@@ -194,7 +223,7 @@ class MainActivity : AppCompatActivity() {
             )
             // Set the X and Y position of the dialog
             val layoutParams = window!!.attributes
-            layoutParams.gravity = Gravity.TOP
+            layoutParams.gravity = Gravity.BOTTOM
             layoutParams.dimAmount = 0.0f
             window!!.setBackgroundDrawable(ColorDrawable(Color.argb(0, 0, 0, 0)))
 
@@ -203,39 +232,101 @@ class MainActivity : AppCompatActivity() {
 
         }
 
-        setOnSeekbar(
+        setOnSeekbarColor(
             "R",
             colorPopupBinding.redLayout.typeTxt,
             colorPopupBinding.redLayout.seekBar,
             colorPopupBinding.redLayout.colorValueTxt,
+            ActionType.COLOR
         )
-        setOnSeekbar(
+        setOnSeekbarColor(
             "G",
             colorPopupBinding.greenLayout.typeTxt,
             colorPopupBinding.greenLayout.seekBar,
             colorPopupBinding.greenLayout.colorValueTxt,
+            ActionType.COLOR
         )
-        setOnSeekbar(
+        setOnSeekbarColor(
             "B",
             colorPopupBinding.blueLayout.typeTxt,
             colorPopupBinding.blueLayout.seekBar,
             colorPopupBinding.blueLayout.colorValueTxt,
+            ActionType.COLOR
         )
-        setOnSeekbar(
+        setOnSeekbarColor(
             "A",
             colorPopupBinding.alphaLayout.typeTxt,
             colorPopupBinding.alphaLayout.seekBar,
             colorPopupBinding.alphaLayout.colorValueTxt,
+            ActionType.COLOR
         )
         setOnSeekbar(
             strokePopupBinding.seekBar,
             strokePopupBinding.ValueTxt,
+            ActionType.STROKE
         )
         setOnSeekbar(
             generCycloPopupBinding.seekBar,
             generCycloPopupBinding.ValueTxt,
+            ActionType.GENCYCLO
         )
-        colorPopupBinding.done.setOnClickListener{
+
+        setOnSeekbarAffine(
+            "V-Shift",
+            affinePopupBinding.transx.typeTxt,
+            affinePopupBinding.transx.seekBar,
+            affinePopupBinding.transx.ValueTxt,
+            -100f, 100f,
+            "pixel", affinePopupBinding.transx.unitTxt,
+            ActionType.TRANSLATE
+        )
+        setOnSeekbarAffine(
+            "H-Shift",
+            affinePopupBinding.transy.typeTxt,
+            affinePopupBinding.transy.seekBar,
+            affinePopupBinding.transy.ValueTxt,
+            -100f, 100f,
+            "pixel", affinePopupBinding.transy.unitTxt,
+            ActionType.TRANSLATE
+        )
+        setOnSeekbarAffineScale(
+            "Scale",
+            affinePopupBinding.scale.typeTxt,
+            affinePopupBinding.scale.seekBar,
+            affinePopupBinding.scale.ValueTxt,
+            0.1f, 10f,
+            "times", affinePopupBinding.scale.unitTxt,
+            ActionType.SCALE
+        )
+        setOnSeekbarAffine(
+            "Rotate",
+            affinePopupBinding.rotate.typeTxt,
+            affinePopupBinding.rotate.seekBar,
+            affinePopupBinding.rotate.ValueTxt,
+            -180f, 180f,
+            "degree", affinePopupBinding.rotate.unitTxt,
+            ActionType.ROTATE
+        )
+        setOnSeekbarAffine(
+            "V-Sheer",
+            affinePopupBinding.sheerx.typeTxt,
+            affinePopupBinding.sheerx.seekBar,
+            affinePopupBinding.sheerx.ValueTxt,
+            -180f, 180f,
+            "degree", affinePopupBinding.sheerx.unitTxt,
+            ActionType.SHEAR
+        )
+        setOnSeekbarAffine(
+            "H-Sheer",
+            affinePopupBinding.sheery.typeTxt,
+            affinePopupBinding.sheery.seekBar,
+            affinePopupBinding.sheery.ValueTxt,
+            -180f, 180f,
+            "degree", affinePopupBinding.sheery.unitTxt,
+            ActionType.SHEAR
+        )
+
+        colorPopupBinding.done.setOnClickListener {
             //colorPopup.visibility = View.GONE
             colorPopup.dismiss()
             //val color = setRGBColor()
@@ -245,76 +336,61 @@ class MainActivity : AppCompatActivity() {
         colorPickerButton.setOnClickListener {
             //colorPopup.visibility = View.VISIBLE
             colorPopup.show()
-            navigateBTN.visibility = View.GONE
-
+            onButtonClicked(colorPickerButton)
         }
-        shapePickerButton.setOnClickListener{
-
-
+        shapePickerButton.setOnClickListener {
             shapePopup.show()
-            //navigateBTN.visibility = View.GONE
+            onButtonClicked(shapePickerButton)
+            deselectAllLayer()
         }
 
-        shapePopupBinding.root.setOnClickListener{
+        shapePopupBinding.root.setOnClickListener {
             shapePopup.dismiss()
             setShape()
+            isDrawAction = true
         }
-        strokePickerButton.setOnClickListener{
+        strokePickerButton.setOnClickListener {
             strokePopup.show()
+            onButtonClicked(strokePickerButton)
         }
-        strokePopupBinding.root.setOnClickListener{
+        strokePopupBinding.root.setOnClickListener {
             strokePopup.dismiss()
             setStroke()
-            println(stroke)
-
         }
-        GenerateButton.setOnClickListener{
+        GenerateButton.setOnClickListener {
             generPopup.show()
+            onButtonClicked(GenerateButton)
         }
-        generCycloPopupBinding.apply.setOnClickListener{
+        generCycloPopupBinding.apply.setOnClickListener {
 
             copies = setCopies()
             // call redraw
 
-            glSurfaceView.genCycloGraph(copies)
+            glSurfaceView.requestRender(ActionType.GENCYCLO)
 
             generPopup.dismiss()
         }
-        affinePickerButton.setOnClickListener{
+        affinePickerButton.setOnClickListener {
             affinePopup.show()
-
+            onButtonClicked(affinePickerButton)
         }
-        affinePopupBinding.root.setOnClickListener{
-
+        affinePopupBinding.root.setOnClickListener {
             generPopup.dismiss()
             setAffine()
-            println(actionType)
         }
     }
 
     private fun setAffine() {
-        //val checkBox = findViewById<CheckBox>(R.id.use2finger)
+
+        V_shift = affinePopupBinding.transx.seekBar.progress.toInt()
+        H_shift = affinePopupBinding.transy.seekBar.progress.toInt()
+        scale = affinePopupBinding.scale.seekBar.progress.toFloat() * 0.1f + 0.1f
+        rotate = affinePopupBinding.rotate.seekBar.progress.toFloat()
+        V_sheer = affinePopupBinding.sheerx.seekBar.progress.toFloat()
+        H_sheer = affinePopupBinding.sheery.seekBar.progress.toFloat()
 
 
-//        if (!affinePopupBinding.use2finger.isChecked) {
-            println ("not checked")
-
-            affinePopupBinding.scale.setOnTouchListener { view, motionEvent ->
-                handleTouchEvent(view, motionEvent, ActionType.SCALE)
-            }
-            affinePopupBinding.translate.setOnTouchListener { view, motionEvent ->
-                handleTouchEvent(view, motionEvent, ActionType.TRANSLATE)
-            }
-            affinePopupBinding.shear.setOnTouchListener { view, motionEvent ->
-                handleTouchEvent(view, motionEvent, ActionType.SHEAR)
-            }
-            affinePopupBinding.rolate.setOnTouchListener { view, motionEvent ->
-                handleTouchEvent(view, motionEvent, ActionType.ROTATE)
-            }
-            affinePopupBinding.mirror.setOnTouchListener { view, motionEvent ->
-                handleTouchEvent(view, motionEvent, ActionType.MIRROR)
-            }
-
+//        return affines
 
 
     }
@@ -347,7 +423,13 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun setOnSeekbar(type: String, typeTxt: TextView, seekBar: SeekBar, colorTxt:TextView) {
+    private fun setOnSeekbarColor(
+        type: String,
+        typeTxt: TextView,
+        seekBar: SeekBar,
+        colorTxt: TextView,
+        actionType: ActionType
+    ) {
 
         typeTxt.text = type
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
@@ -356,25 +438,24 @@ class MainActivity : AppCompatActivity() {
                     colorTxt.text = seekBar.progress.toString()
                 }
                 setRGBColor()
+                glSurfaceView.requestRender(ActionType.COLOR)
+                //glSurfaceView.requestRender(actionType)
             }
 
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
 
-            }
-
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {
-
-            }
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
         colorTxt.text = seekBar.progress.toString()
     }
 
-    private fun setRGBColor(){
+    private fun setRGBColor() {
         color = floatArrayOf(
-            colorPopupBinding.redLayout.seekBar.progress.toFloat()/255,
-            colorPopupBinding.greenLayout.seekBar.progress.toFloat()/255,
-            colorPopupBinding.blueLayout.seekBar.progress.toFloat()/255,
-            colorPopupBinding.alphaLayout.seekBar.progress.toFloat()/255)
+            colorPopupBinding.redLayout.seekBar.progress.toFloat() / 255,
+            colorPopupBinding.greenLayout.seekBar.progress.toFloat() / 255,
+            colorPopupBinding.blueLayout.seekBar.progress.toFloat() / 255,
+            colorPopupBinding.alphaLayout.seekBar.progress.toFloat() / 255
+        )
         val hex = String.format(
             "#%02x%02x%02x%02x",
             colorPopupBinding.alphaLayout.seekBar.progress,
@@ -382,16 +463,18 @@ class MainActivity : AppCompatActivity() {
             colorPopupBinding.greenLayout.seekBar.progress,
             colorPopupBinding.blueLayout.seekBar.progress,
 
-        )
+            )
         colorPopupBinding.viewColor.setBackgroundColor(Color.parseColor(hex))
-
+        // goi ham chuyen mau o day
     }
-    private fun setOnSeekbar(seekBar: SeekBar, value: TextView) {
-        seekBar.setOnSeekBarChangeListener(object :SeekBar.OnSeekBarChangeListener {
+
+    private fun setOnSeekbar(seekBar: SeekBar, value: TextView, actionType: ActionType) {
+        seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (seekBar != null) {
                     value.text = seekBar.progress.toString()
                 }
+                glSurfaceView.requestRender(actionType)
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
@@ -403,9 +486,79 @@ class MainActivity : AppCompatActivity() {
             }
         })
     }
-    private fun setStroke(){
-        stroke = strokePopupBinding.seekBar.progress.toFloat()/100
+
+    private fun setStroke() {
+        stroke = strokePopupBinding.seekBar.progress.toFloat() / 100
     }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun setOnSeekbarAffine(
+        type: String, typeTxt: TextView, seekBar: SeekBar, valueTxt: TextView,
+        min: Float, max: Float, unit: String, unitTxt: TextView, actionType: ActionType
+    ) {
+        typeTxt.text = type
+        seekBar.min = min.toInt()
+        seekBar.max = max.toInt()
+        unitTxt.text = unit
+
+        seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                valueTxt.text = seekBar?.progress.toString()
+                glSurfaceView.requestRender(actionType)
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+
+            }
+        })
+        valueTxt.text = seekBar.progress.toString()
+    }
+
+    private fun setOnSeekbarAffineScale(
+        type: String,
+        typeTxt: TextView,
+        seekBar: SeekBar,
+        valueTxt: TextView,
+        min: Float,
+        max: Float,
+        unit: String,
+        unitTxt: TextView,
+        actionType: ActionType
+    ) {
+        typeTxt.text = type
+        unitTxt.text = unit
+        val defaultScale = 1.0f
+        val minScale = 0.1f
+        val maxScale = max
+        val seekBarMax = ((maxScale - minScale) / 0.1).toInt() // You can adjust the step size
+        seekBar.max = seekBarMax
+        seekBar.progress = (defaultScale).toInt()
+
+        seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                if (seekBar != null) {
+                    val scale = minScale + progress * 0.1
+                    valueTxt.text = String.format("%.2f", scale)
+                }
+
+                glSurfaceView.requestRender(actionType)
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+
+            }
+        })
+        valueTxt.text = seekBar.progress.toString()
+    }
+
     override fun onPause() {
         super.onPause()
         glSurfaceView.onPause()
@@ -424,22 +577,7 @@ class MainActivity : AppCompatActivity() {
                 shapeType = type
 
             }
-            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                // Animation for touch up or touch cancel (scale back to normal)
-                scaleView(view, 1.2f, 1.0f)
-            }
-        }
-        return true
-    }
-    private fun handleTouchEvent(view: View, motionEvent: MotionEvent, type: ActionType): Boolean {
-        when (motionEvent.action) {
-            MotionEvent.ACTION_DOWN -> {
-                // Animation for touch down (scale up)
-                scaleView(view, 1.0f, 1.2f)
-                actionType = type
 
-
-            }
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                 // Animation for touch up or touch cancel (scale back to normal)
                 scaleView(view, 1.2f, 1.0f)
@@ -470,5 +608,21 @@ class MainActivity : AppCompatActivity() {
 
         // Start the animation
         view.startAnimation(scaleAnimation)
+    }
+
+    private fun onButtonClicked(clickedButton: ImageButton) {
+        for (button in actionButtons) {
+            button.setBackgroundColor(0xFFFFFFFF.toInt())
+        }
+
+        clickedButton.setBackgroundColor(0xFFA9A9A9.toInt())
+    }
+
+    private fun deselectAllLayer(){
+        //TODO
+        for (i in 0..<activeList.size){
+            activeList[i] = false
+
+        }
     }
 }

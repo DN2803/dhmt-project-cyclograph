@@ -32,13 +32,13 @@
         android:layout_margin="16dp"
         android:orientation="vertical">
 
-        <include layout="@layout/colot_popup_item"
+        <include layout="@layout/color_popup_item"
             android:id="@+id/redLayout"/>
-        <include layout="@layout/colot_popup_item"
+        <include layout="@layout/color_popup_item"
             android:id="@+id/greenLayout"/>
-        <include layout="@layout/colot_popup_item"
+        <include layout="@layout/color_popup_item"
             android:id="@+id/blueLayout"/>
-        <include layout="@layout/colot_popup_item"
+        <include layout="@layout/color_popup_item"
             android:id="@+id/alphaLayout"/>
 
     </LinearLayout>

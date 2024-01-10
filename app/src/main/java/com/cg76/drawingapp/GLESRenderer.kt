@@ -5,6 +5,9 @@ import javax.microedition.khronos.opengles.GL10
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.opengl.Matrix
+import com.cg76.drawingapp.GLESSurfaceView.Companion.beforeGenShapeCount
+import com.cg76.drawingapp.MainActivity.Companion.activeList
+import com.cg76.drawingapp.MainActivity.Companion.color
 import com.cg76.drawingapp.Shape.*
 import kotlin.math.PI
 import kotlin.math.cos
@@ -88,12 +91,19 @@ class GLESRenderer: GLSurfaceView.Renderer {
     }
 
 
-    fun addShape(shape: Shape?, isTemp: Boolean=false){
+    fun addShape(shape: Shape?, isTemp: Boolean=false, wasGenCyclo: Boolean=false){
         cleanShapes()
-        if (shape != null) {
+
+        if (shape != null){
             shape.createProgram()
-            shapes.add(shape)
             shape.isTemp = isTemp
+
+            if (wasGenCyclo){
+                for (i in 0..<shapes.size)
+                    if (shapes[i].isClone) shapes.add(i,shape)
+            }
+            else
+                shapes.add(shape)
         }
     }
 
@@ -101,19 +111,18 @@ class GLESRenderer: GLSurfaceView.Renderer {
         if (id !in 0..<shapes.size) return
 
 
-
     }
 
-    private fun clearCloneShape(){
-        while (shapes.size > GLESSurfaceView.beforeGenShapeCount){
-            shapes.removeAt(GLESSurfaceView.beforeGenShapeCount)
-        }
-    }
+//    private fun clearCloneShapeOf(index: Int) {
+//        var i = index
+//
+//        while (i < shapes.size){
+//            shapes.removeAt(index)
+//            i += beforeGenShapeCount - 1
+//        }
+//    }
 
     fun generateCyclograph(copies: Int){
-        clearCloneShape()
-
-        val nShape = GLESSurfaceView.beforeGenShapeCount
         val delta = 2*PI.toFloat()/copies
         var angle = delta
 
@@ -121,7 +130,11 @@ class GLESRenderer: GLSurfaceView.Renderer {
         var sinTheta = sin(angle)
 
         for (i in 1..<copies){
-            for (j in 0..<nShape){
+            for (j in 0..<activeList.size){
+                if (!activeList[j]){
+                    continue
+                }
+                clearCloneShapeOf(j)
                 var newVertices = mutableListOf<Vertex>()
 
                 for (vertex in shapes[j].vertices){
@@ -149,6 +162,34 @@ class GLESRenderer: GLSurfaceView.Renderer {
 
 
         // draw
+    }
+
+    fun colorShape(){
+        for (i in 0..<activeList.size){
+            if (activeList[i]){
+                shapes[i].color = color
+            }
+        }
+    }
+
+    fun scaleShape(){
+
+    }
+
+    fun rotateShape(){
+
+    }
+
+    fun translateShape(){
+
+    }
+
+    fun mirrorShape(){
+
+    }
+
+    fun shearShape(){
+
     }
 }
 

@@ -3,61 +3,30 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:paddingTop="60dp"
-    android:paddingLeft="20dp">
+    android:gravity="bottom"
+    android:background="@color/backgroundPopUp"
+    android:paddingBottom="60dp"
+    xmlns:tools="http://schemas.android.com/tools">
+
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="16dp"
         android:orientation="vertical">
 
+        <include layout="@layout/affine_popup_item"
+            android:id="@+id/transx"/>
+        <include layout="@layout/affine_popup_item"
+            android:id="@+id/transy"/>
+        <include layout="@layout/affine_popup_item"
+            android:id="@+id/scale"/>
+        <include layout="@layout/affine_popup_item"
+            android:id="@+id/rotate"/>
+        <include layout="@layout/affine_popup_item"
+            android:id="@+id/sheerx"/>
+        <include layout="@layout/affine_popup_item"
+            android:id="@+id/sheery"/>
 
-
-
-    <TextView
-        android:id="@+id/scale"
-        android:layout_width="wrap_content"
-        android:layout_height="25dp"
-        android:layout_weight="4"
-        android:text="Scale" />
-
-
-
-
-
-    <TextView
-        android:id="@+id/translate"
-        android:layout_width="wrap_content"
-        android:layout_height="25dp"
-        android:layout_weight="4"
-        android:text="Translate" />
-
-
-
-    <TextView
-        android:id="@+id/shear"
-        android:layout_width="wrap_content"
-        android:layout_height="25dp"
-        android:layout_weight="4"
-        android:text="Shear" />
-
-
-
-
-    <TextView
-        android:id="@+id/rolate"
-        android:layout_width="wrap_content"
-        android:layout_height="25dp"
-        android:layout_weight="4"
-        android:text="Rolate"/>
-
-
-
-    <TextView
-        android:id="@+id/mirror"
-        android:layout_width="wrap_content"
-        android:layout_height="25dp"
-        android:layout_weight="4"
-        android:text="Mirror" />
     </LinearLayout>
 
 </LinearLayout>

@@ -16,7 +16,7 @@ enum class ShapeType{
 }
 
 enum class ActionType{
-     DRAW, SCALE, ROTATE, TRANSLATE, MIRROR, SHEAR
+     DRAW, STROKE, COLOR, FOO, SCALE, ROTATE, TRANSLATE, MIRROR, SHEAR, GENCYCLO
 }
 
 abstract class Shape(

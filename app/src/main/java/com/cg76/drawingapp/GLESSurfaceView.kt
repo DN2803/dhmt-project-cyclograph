@@ -4,10 +4,10 @@ import android.content.Context
 import android.opengl.GLSurfaceView
 import android.util.AttributeSet
 import android.view.MotionEvent
-import com.cg76.drawingapp.MainActivity.Companion.actionType
 import com.cg76.drawingapp.MainActivity.Companion.addLayerButton
+import com.cg76.drawingapp.MainActivity.Companion.color
+import com.cg76.drawingapp.MainActivity.Companion.isDrawAction
 import com.cg76.drawingapp.MainActivity.Companion.shapeType
-import com.cg76.drawingapp.MainActivity.Companion.shapeID
 import com.cg76.drawingapp.Shape.*
 import com.cg76.drawingapp.Shape.ActionType.*
 
@@ -19,7 +19,6 @@ class GLESSurfaceView @JvmOverloads constructor(
     companion object{
         lateinit var renderer: GLESRenderer
         val factory = BuilderFactory()
-        var color = floatArrayOf(0f, 0f, 0f, 0f)
         var size = 15f
         var beforeGenShapeCount = 0
     }
@@ -49,9 +48,8 @@ class GLESSurfaceView @JvmOverloads constructor(
     // factory here
     override fun onTouchEvent(e: MotionEvent): Boolean {
 
-        when (actionType) {
-            DRAW -> drawShape(e, shapeType)
-            SCALE, ROTATE, TRANSLATE, MIRROR, SHEAR -> affineTrans(e, actionType, shapeID)
+        if (isDrawAction) {
+            drawShape(e, shapeType)
         }
 
         when (e.action and MotionEvent.ACTION_MASK) {
@@ -72,7 +70,6 @@ class GLESSurfaceView @JvmOverloads constructor(
         val pointerCount = e.pointerCount
         when (e.action and MotionEvent.ACTION_MASK) {
             MotionEvent.ACTION_DOWN -> {
-                // Chạm một ngón tay
                 startPoint = floatArrayOf(e.x, e.y)
                 performClick()
             }
@@ -109,38 +106,93 @@ class GLESSurfaceView @JvmOverloads constructor(
     private var previousX: Float = 0f
     private var previousY: Float = 0f
 
-    private fun affineTrans(e: MotionEvent, type: ActionType, shapeID: Int){
-        //val transMatrixBuilder = TransMatrixBuilder()
-        lateinit var transMatrix: FloatArray
+//    private fun affineTrans(e: MotionEvent, type: ActionType, shapeID: Int){
+//        //val transMatrixBuilder = TransMatrixBuilder()
+//        lateinit var transMatrix: FloatArray
+//
+//        when (e.action) {
+//            MotionEvent.ACTION_MOVE -> {
+//                var dx: Float = x - previousX
+//                var dy: Float = y - previousY
+//                // reverse direction of rotation above the mid-line
+//                if (y > height / 2) {
+//                    dx *= -1
+//                }
+//                // reverse direction of rotation to left of the mid-line
+//                if (x < width / 2) {
+//                    dy *= -1
+//                }
+//                //transMatrix = transMatrixBuilder.build(ROTATE, dx, dy)
+//
+//                //queueEvent() { renderer.updateShapeAt(transMatrix, shapeID)}
+//
+//                requestRender()
+//            }
+//        }
+//
+//        previousX = x
+//        previousY = y
+//    }
 
-        when (e.action) {
-            MotionEvent.ACTION_MOVE -> {
-                var dx: Float = x - previousX
-                var dy: Float = y - previousY
-                // reverse direction of rotation above the mid-line
-                if (y > height / 2) {
-                    dx *= -1
-                }
-                // reverse direction of rotation to left of the mid-line
-                if (x < width / 2) {
-                    dy *= -1
-                }
-                //transMatrix = transMatrixBuilder.build(ROTATE, dx, dy)
-
-                //queueEvent() { renderer.updateShapeAt(transMatrix, shapeID)}
-
-                requestRender()
-            }
+    fun requestRender(actionType: ActionType){
+        when(actionType){
+            COLOR -> colorShape()
+            SCALE -> scaleShape()
+            ROTATE -> rotateShape()
+            TRANSLATE -> translateShape()
+            MIRROR -> mirrorShape()
+            SHEAR -> shearShape()
+            GENCYCLO -> genCycloGraph()
+            else -> ""
         }
-
-        previousX = x
-        previousY = y
     }
 
-    fun genCycloGraph(copies: Int) {
+    private fun genCycloGraph() {
         queueEvent {
             renderer.generateCyclograph(MainActivity.copies)
         }
+        requestRender()
+    }
+
+    private fun colorShape(){
+        queueEvent{
+            renderer.colorShape()
+        }
+        requestRender()
+    }
+
+    private fun scaleShape(){
+        queueEvent{
+            renderer.scaleShape()
+        }
+        requestRender()
+    }
+
+    private fun rotateShape(){
+        queueEvent{
+            renderer.rotateShape()
+        }
+        requestRender()
+    }
+
+    private fun translateShape(){
+        queueEvent{
+            renderer.translateShape()
+        }
+        requestRender()
+    }
+
+    private fun mirrorShape(){
+        queueEvent{
+            renderer.mirrorShape()
+        }
+        requestRender()
+    }
+    private fun shearShape(){
+        queueEvent{
+            renderer.shearShape()
+        }
+
         requestRender()
     }
 }
