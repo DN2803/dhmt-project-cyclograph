@@ -5,6 +5,7 @@ import android.opengl.GLSurfaceView
 import android.util.AttributeSet
 import android.view.MotionEvent
 import com.cg76.drawingapp.MainActivity.Companion.actionType
+import com.cg76.drawingapp.MainActivity.Companion.addLayerButton
 import com.cg76.drawingapp.MainActivity.Companion.shapeType
 import com.cg76.drawingapp.MainActivity.Companion.shapeID
 import com.cg76.drawingapp.Shape.*
@@ -92,12 +93,15 @@ class GLESSurfaceView @JvmOverloads constructor(
             MotionEvent.ACTION_UP -> {
                 endPoint = floatArrayOf(e.x, e.y)
 
-                var builder = factory.select(type)
-                var shape = builder?.build(startPoint,endPoint, color, size)
+                if (endPoint != startPoint) {
+                    var builder = factory.select(type)
+                    var shape = builder?.build(startPoint,endPoint, color, size)
 
-                queueEvent { renderer.addShape(shape) }
-                requestRender()
-                beforeGenShapeCount++
+                    queueEvent { renderer.addShape(shape) }
+                    requestRender()
+                    addLayerButton()
+                    beforeGenShapeCount++
+                }
             }
         }
     }
