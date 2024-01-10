@@ -15,6 +15,7 @@ import android.widget.TextView
 import android.view.MotionEvent
 import android.view.animation.Animation
 import android.view.animation.ScaleAnimation
+import android.widget.Button
 import com.cg76.drawingapp.Shape.ActionType
 import com.cg76.drawingapp.Shape.ShapeType
 import com.cg76.drawingapp.databinding.AffinePopupBinding
@@ -26,6 +27,7 @@ import com.cg76.drawingapp.databinding.StrokePopupBinding
 
 
 class MainActivity : AppCompatActivity() {
+
     companion object{
         var shapeType = ShapeType.LINE
         var stroke: Float = 1f
@@ -34,6 +36,29 @@ class MainActivity : AppCompatActivity() {
         var shapeID: Int = 0
         var actionType = ActionType.DRAW
         lateinit var glSurfaceView: GLESSurfaceView
+        lateinit var layerList: LinearLayout
+        var context: MainActivity? = null
+
+        var buttonCount = 0
+
+        fun addLayerButton() {
+            val newButton = Button(context)
+
+            newButton.layoutParams = LinearLayout.LayoutParams(
+                layerList.width / 5,
+                LinearLayout.LayoutParams.MATCH_PARENT // height
+            )
+
+            buttonCount++
+            newButton.id = buttonCount
+            newButton.text = "Layer $buttonCount"
+
+            newButton.setOnClickListener {
+                shapeID = buttonCount
+            }
+
+            layerList.addView(newButton)
+        }
     }
 
     private lateinit var colorPickerButton: ImageButton
@@ -41,7 +66,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var strokePickerButton: ImageButton
     private lateinit var GenerateButton: ImageButton
     private lateinit var affinePickerButton: ImageButton
-
 
     private val colorPopupBinding : ColorPopupBinding by lazy {
         ColorPopupBinding.inflate(layoutInflater)
@@ -58,15 +82,19 @@ class MainActivity : AppCompatActivity() {
     private val affinePopupBinding : AffinePopupBinding by lazy {
         AffinePopupBinding.inflate(layoutInflater)
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        context = this
 
         glSurfaceView = findViewById(R.id.glSurfaceView)
 
+        layerList = findViewById(R.id.layerList)
 
         var navigateBTN = findViewById<LinearLayout>(R.id.navigate)
         shapePickerButton =  findViewById<ImageButton>(R.id.btn_draw)
+
         // pick shape type
         val shapePopup = Dialog(this).apply {
             setContentView(shapePopupBinding.root)
@@ -75,7 +103,6 @@ class MainActivity : AppCompatActivity() {
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
 
-
             )
             // Set the X and Y position of the dialog
             val layoutParams = window!!.attributes
@@ -83,9 +110,7 @@ class MainActivity : AppCompatActivity() {
             layoutParams.dimAmount = 0.0f
             window!!.setBackgroundDrawable(ColorDrawable(Color.argb(0, 0, 0, 0)))
 
-
             setCancelable(true)
-
         }
 
 
@@ -443,5 +468,4 @@ class MainActivity : AppCompatActivity() {
         // Start the animation
         view.startAnimation(scaleAnimation)
     }
-
 }
