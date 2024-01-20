@@ -27,6 +27,10 @@ import com.cg76.drawingapp.databinding.GenerCycloPopupBinding
 import com.cg76.drawingapp.databinding.ShapePopupBinding
 import com.cg76.drawingapp.databinding.StrokePopupBinding
 import android.graphics.drawable.LayerDrawable
+import android.graphics.drawable.ShapeDrawable
+import android.graphics.drawable.shapes.RectShape
+import android.widget.GridLayout
+import androidx.core.content.ContextCompat
 
 
 class MainActivity : AppCompatActivity() {
@@ -78,6 +82,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             layerList.addView(newButton)
+
         }
     }
 
@@ -92,6 +97,7 @@ class MainActivity : AppCompatActivity() {
     private val colorPopupBinding: ColorPopupBinding by lazy {
         ColorPopupBinding.inflate(layoutInflater)
     }
+
     private val shapePopupBinding: ShapePopupBinding by lazy {
         ShapePopupBinding.inflate(layoutInflater)
     }
@@ -104,6 +110,8 @@ class MainActivity : AppCompatActivity() {
     private val affinePopupBinding: AffinePopupBinding by lazy {
         AffinePopupBinding.inflate(layoutInflater)
     }
+
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -344,18 +352,61 @@ class MainActivity : AppCompatActivity() {
 
 
         }
-        colorPopupBinding.style1.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(view: View) {
-                colorPopupBinding.palette.visibility = View.VISIBLE
-                colorPopupBinding.rgbaSlider.visibility = View.GONE
+
+        colorPopupBinding.style1.setOnClickListener {
+            colorPopupBinding.palette.visibility = View.VISIBLE
+            colorPopupBinding.rgbaSlider.visibility = View.GONE
+
+            var colorGrid = colorPopupBinding.colorGrid
+
+            // Clear existing color buttons if any
+            colorGrid.removeAllViews()
+
+            // Mảng chứa mã màu của các màu cơ bản
+            val basicColors = arrayOf(
+                "#FF0000",
+                "#00FF00",
+                "#0000FF",
+                "#FFFFFF",
+                "#000000",
+                "#FFFF00",
+                "#FFA500",
+                "#FFC0CB",
+                "#808080",
+                "#A52A2A",
+                "#800080",
+                "#008000",
+                "#000080",
+                "#00FFFF",
+                "#008080",
+                "#008000",
+                "#2E8B57",
+                "#90EE90",
+                "#006400",
+                "#000080",
+            )
+
+            for (i in basicColors.indices) {
+                val colorButton = Button(colorPopupBinding.buttonColor.context)
+                colorButton.layoutParams = GridLayout.LayoutParams()
+                colorButton.width = 50
+                colorButton.height = 50
+                colorButton.setBackgroundColor(Color.parseColor(basicColors[i]))
+                colorButton.setOnClickListener { view ->
+                    clearSelection(colorGrid)
+                    applySelectionEffect(colorButton)
+                    val selectedColor = Color.parseColor(basicColors[i])
+                    color = colorToRGBA(selectedColor)
+                    // TODO: Xử lý giá trị RGBA theo nhu cầu (ví dụ: hiển thị, sử dụng trong ứng dụng, ...)
+                }
+                colorGrid.addView(colorButton)
             }
-        })
-        colorPopupBinding.style2.setOnClickListener(object :View.OnClickListener {
-            override fun onClick(view: View) {
-                colorPopupBinding.palette.visibility = View.GONE
-                colorPopupBinding.rgbaSlider.visibility = View.VISIBLE
-            }
-        })
+        }
+
+        colorPopupBinding.style2.setOnClickListener {
+            colorPopupBinding.palette.visibility = View.GONE
+            colorPopupBinding.rgbaSlider.visibility = View.VISIBLE
+        }
 
 
 
@@ -400,7 +451,16 @@ class MainActivity : AppCompatActivity() {
             setAffine()
         }
     }
-
+    private fun colorToRGBA(color: Int): FloatArray {
+        val r =  Color.red(color)/255.0f
+        val g = Color.green(color)/255.0f
+        val b = Color.blue(color)/255.0f
+        val a = Color.alpha(color) / 255.0f // Normalize alpha to the range [0, 1]
+        return floatArrayOf(r, g, b, a)
+    }
+    fun selectColor(view: View) {
+        // Handle color selection if needed
+    }
     private fun setAffine() {
 
         V_shift = affinePopupBinding.transx.seekBar.progress.toInt()
@@ -415,6 +475,7 @@ class MainActivity : AppCompatActivity() {
 
 
     }
+
 
     private fun setCopies(): Int {
         val _copies = generCycloPopupBinding.seekBar.progress.toInt()
@@ -459,7 +520,7 @@ class MainActivity : AppCompatActivity() {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (seekBar != null) {
                     colorTxt.text = seekBar.progress.toString()
-                    //var (red, green, blue) =Triple(0, 0, 0)
+
                     var seekbar_color = Color.rgb(red, green, blue)
                     if (type == "R") {
                         red = progress
@@ -737,4 +798,22 @@ class MainActivity : AppCompatActivity() {
 
         }
     }
+
+
+    private fun clearSelection(colorGrid: GridLayout) {
+        for (i in 0 until colorGrid.childCount) {
+            val colorButton = colorGrid.getChildAt(i) as Button
+            colorButton.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, null, null)
+        }
+    }
+
+    private fun applySelectionEffect(colorButton: Button) {
+        // Create a checkmark drawable
+        val checkmarkDrawable = ContextCompat.getDrawable(this, android.R.drawable.checkbox_on_background)
+
+        // Set the checkmark drawable as a compound drawable on the button
+        colorButton.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, checkmarkDrawable, null)
+    }
+
 }
+
