@@ -342,7 +342,12 @@ class MainActivity : AppCompatActivity() {
             //colorPopup.visibility = View.GONE
             colorPopup.dismiss()
             //val color = setRGBColor()
-            println(color);
+            navigateBTN.visibility = View.VISIBLE
+        }
+        colorPopupBinding.root.setOnClickListener {
+            //colorPopup.visibility = View.GONE
+            colorPopup.dismiss()
+            //val color = setRGBColor()
             navigateBTN.visibility = View.VISIBLE
         }
         colorPickerButton.setOnClickListener {
@@ -415,9 +420,33 @@ class MainActivity : AppCompatActivity() {
             onButtonClicked(shapePickerButton)
             deselectAllLayer()
         }
-
-        shapePopupBinding.root.setOnClickListener {
-            setShape()
+        shapePopupBinding.drawCricle.setOnClickListener{
+            shapeType = ShapeType.CIRCLE
+            isDrawAction = true
+            shapePopup.dismiss()
+        }
+        shapePopupBinding.drawBrush.setOnClickListener{
+            shapeType = ShapeType.BRUSH
+            isDrawAction = true
+            shapePopup.dismiss()
+        }
+        shapePopupBinding.drawLine.setOnClickListener{
+            shapeType = ShapeType.LINE
+            isDrawAction = true
+            shapePopup.dismiss()
+        }
+        shapePopupBinding.drawCurve.setOnClickListener{
+            shapeType = ShapeType.CURVE
+            isDrawAction = true
+            shapePopup.dismiss()
+        }
+        shapePopupBinding.drawPolygon.setOnClickListener{
+            shapeType = ShapeType.TRIANGLE
+            isDrawAction = true
+            shapePopup.dismiss()
+        }
+        shapePopupBinding.drawElipse.setOnClickListener{
+            shapeType = ShapeType.ELIPSE
             isDrawAction = true
             shapePopup.dismiss()
         }
@@ -447,8 +476,8 @@ class MainActivity : AppCompatActivity() {
             onButtonClicked(affinePickerButton)
         }
         affinePopupBinding.root.setOnClickListener {
-            generPopup.dismiss()
             setAffine()
+            affinePopup.dismiss()
         }
     }
     private fun colorToRGBA(color: Int): FloatArray {
@@ -482,28 +511,7 @@ class MainActivity : AppCompatActivity() {
         return _copies
     }
 
-    @SuppressLint("ClickableViewAccessibility")
-    private fun setShape() {
-        shapePopupBinding.drawBrush.setOnTouchListener { view, motionEvent ->
-            handleTouchEvent(view, motionEvent, ShapeType.BRUSH)
-        }
-        shapePopupBinding.drawLine.setOnTouchListener { view, motionEvent ->
-            handleTouchEvent(view, motionEvent, ShapeType.LINE)
-        }
-        shapePopupBinding.drawCurve.setOnTouchListener { view, motionEvent ->
-            handleTouchEvent(view, motionEvent, ShapeType.CURVE)
-        }
-        shapePopupBinding.drawElipse.setOnTouchListener { view, motionEvent ->
-            handleTouchEvent(view, motionEvent, ShapeType.ELIPSE)
-        }
-        shapePopupBinding.drawCricle.setOnTouchListener { view, motionEvent ->
-            handleTouchEvent(view, motionEvent, ShapeType.CIRCLE)
-        }
-        shapePopupBinding.drawPolygon.setOnTouchListener { view, motionEvent ->
-            handleTouchEvent(view, motionEvent, ShapeType.TRIANGLE)
-        }
 
-    }
     var red = 0
     var green = 0
     var blue = 0
@@ -742,46 +750,7 @@ class MainActivity : AppCompatActivity() {
         glSurfaceView.onResume()
     }
 
-    private fun handleTouchEvent(view: View, motionEvent: MotionEvent, type: ShapeType): Boolean {
-        when (motionEvent.action) {
-            MotionEvent.ACTION_DOWN -> {
-                // Animation for touch down (scale up)
-                scaleView(view, 1.0f, 1.2f)
-                shapeType = type
 
-            }
-
-            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                // Animation for touch up or touch cancel (scale back to normal)
-                scaleView(view, 1.2f, 1.0f)
-            }
-        }
-        return true
-    }
-
-    private fun scaleView(view: View, fromScale: Float, toScale: Float) {
-        val scaleAnimation = ScaleAnimation(
-            fromScale, toScale, fromScale, toScale,
-            Animation.RELATIVE_TO_SELF, 0.5f,
-            Animation.RELATIVE_TO_SELF, 0.5f
-        )
-
-        scaleAnimation.duration = 200 // Set the duration of the animation in milliseconds
-
-        // Set the animation listener to reset the view after the animation ends
-        scaleAnimation.setAnimationListener(object : Animation.AnimationListener {
-            override fun onAnimationStart(animation: Animation?) {}
-            override fun onAnimationEnd(animation: Animation?) {
-                // Reset the scale after the animation ends
-                view.clearAnimation()
-            }
-
-            override fun onAnimationRepeat(animation: Animation?) {}
-        })
-
-        // Start the animation
-        view.startAnimation(scaleAnimation)
-    }
 
     private fun onButtonClicked(clickedButton: ImageButton) {
         for (button in actionButtons) {

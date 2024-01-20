@@ -11,8 +11,8 @@
 
         <ImageView
             android:id="@+id/draw_brush"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:layout_weight="4"
             android:src="@mipmap/paint_brush" />
 
@@ -22,8 +22,8 @@
 
         <ImageView
             android:id="@+id/draw_line"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:layout_weight="4"
             android:src="@mipmap/nodes" />
 
@@ -32,8 +32,8 @@
 
         <ImageView
             android:id="@+id/draw_polygon"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:layout_weight="4"
             android:src="@mipmap/square" />
 
@@ -42,23 +42,23 @@
 
         <ImageView
             android:id="@+id/draw_curve"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:layout_weight="4"
             android:src="@mipmap/line" />
 
 
         <ImageView
             android:id="@+id/draw_cricle"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:layout_weight="4"
             android:src="@mipmap/icons8_circle" />
 
         <ImageView
             android:id="@+id/draw_elipse"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:layout_weight="4"
             android:src="@mipmap/elips" />
 
