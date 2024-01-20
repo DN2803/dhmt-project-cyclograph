@@ -1,0 +1,10 @@
+<!-- background_gradient.xml -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <!-- Gradient for the secondary progress track (background of the progress) -->
+        <gradient
+            android:startColor="#C0C0C0"
+            android:endColor="#C0C0C0"
+            android:angle="0"/>
+    </item>
+</layer-list>

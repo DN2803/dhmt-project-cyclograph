@@ -3,21 +3,22 @@ package com.cg76.drawingapp
 import android.annotation.SuppressLint
 import android.app.Dialog
 import android.graphics.Color
+import android.graphics.PorterDuff
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Gravity
+import android.view.MotionEvent
 import android.view.View
+import android.view.animation.Animation
+import android.view.animation.ScaleAnimation
+import android.widget.Button
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.SeekBar
 import android.widget.TextView
-import android.view.MotionEvent
-import android.view.animation.Animation
-import android.view.animation.ScaleAnimation
-import android.widget.Button
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import com.cg76.drawingapp.Shape.ActionType
 import com.cg76.drawingapp.Shape.ShapeType
 import com.cg76.drawingapp.databinding.AffinePopupBinding
@@ -25,7 +26,7 @@ import com.cg76.drawingapp.databinding.ColorPopupBinding
 import com.cg76.drawingapp.databinding.GenerCycloPopupBinding
 import com.cg76.drawingapp.databinding.ShapePopupBinding
 import com.cg76.drawingapp.databinding.StrokePopupBinding
-
+import android.graphics.drawable.LayerDrawable
 
 
 class MainActivity : AppCompatActivity() {
@@ -34,7 +35,7 @@ class MainActivity : AppCompatActivity() {
         var isDrawAction = false
         var shapeType = ShapeType.LINE
         var stroke: Float = 1f
-        var color = floatArrayOf(0f, 0f, 0f, 0f)
+        var color = floatArrayOf(0f, 0f, 0f, 1f)
         var copies: Int = 0
         lateinit var glSurfaceView: GLESSurfaceView
 
@@ -254,7 +255,7 @@ class MainActivity : AppCompatActivity() {
             ActionType.COLOR
         )
         setOnSeekbarColor(
-            "A",
+            "Opacity",
             colorPopupBinding.alphaLayout.typeTxt,
             colorPopupBinding.alphaLayout.seekBar,
             colorPopupBinding.alphaLayout.colorValueTxt,
@@ -304,7 +305,7 @@ class MainActivity : AppCompatActivity() {
             affinePopupBinding.rotate.seekBar,
             affinePopupBinding.rotate.ValueTxt,
             -180f, 180f,
-            "degree", affinePopupBinding.rotate.unitTxt,
+            "\u25E6", affinePopupBinding.rotate.unitTxt,
             ActionType.ROTATE
         )
         setOnSeekbarAffine(
@@ -313,7 +314,7 @@ class MainActivity : AppCompatActivity() {
             affinePopupBinding.sheerx.seekBar,
             affinePopupBinding.sheerx.ValueTxt,
             -180f, 180f,
-            "degree", affinePopupBinding.sheerx.unitTxt,
+            "\u25E6", affinePopupBinding.sheerx.unitTxt,
             ActionType.SHEAR
         )
         setOnSeekbarAffine(
@@ -322,9 +323,12 @@ class MainActivity : AppCompatActivity() {
             affinePopupBinding.sheery.seekBar,
             affinePopupBinding.sheery.ValueTxt,
             -180f, 180f,
-            "degree", affinePopupBinding.sheery.unitTxt,
+            "\u25E6", affinePopupBinding.sheery.unitTxt,
             ActionType.SHEAR
         )
+
+
+
 
         colorPopupBinding.done.setOnClickListener {
             //colorPopup.visibility = View.GONE
@@ -337,7 +341,24 @@ class MainActivity : AppCompatActivity() {
             //colorPopup.visibility = View.VISIBLE
             colorPopup.show()
             onButtonClicked(colorPickerButton)
+
+
         }
+        colorPopupBinding.style1.setOnClickListener(object : View.OnClickListener {
+            override fun onClick(view: View) {
+                colorPopupBinding.palette.visibility = View.VISIBLE
+                colorPopupBinding.rgbaSlider.visibility = View.GONE
+            }
+        })
+        colorPopupBinding.style2.setOnClickListener(object :View.OnClickListener {
+            override fun onClick(view: View) {
+                colorPopupBinding.palette.visibility = View.GONE
+                colorPopupBinding.rgbaSlider.visibility = View.VISIBLE
+            }
+        })
+
+
+
         shapePickerButton.setOnClickListener {
             shapePopup.show()
             onButtonClicked(shapePickerButton)
@@ -345,9 +366,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         shapePopupBinding.root.setOnClickListener {
-            shapePopup.dismiss()
             setShape()
             isDrawAction = true
+            shapePopup.dismiss()
         }
         strokePickerButton.setOnClickListener {
             strokePopup.show()
@@ -422,7 +443,9 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
-
+    var red = 0
+    var green = 0
+    var blue = 0
     private fun setOnSeekbarColor(
         type: String,
         typeTxt: TextView,
@@ -436,6 +459,40 @@ class MainActivity : AppCompatActivity() {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (seekBar != null) {
                     colorTxt.text = seekBar.progress.toString()
+                    //var (red, green, blue) =Triple(0, 0, 0)
+                    var seekbar_color = Color.rgb(red, green, blue)
+                    if (type == "R") {
+                        red = progress
+
+                        updateBackgroundColor(seekBar, progress, 1)
+                        updateBackgroundColor(colorPopupBinding.greenLayout.seekBar, progress, 2)
+                        updateBackgroundColor(colorPopupBinding.blueLayout.seekBar, progress, 3)
+
+
+                    }
+                    if (type == "G") {
+                        green = progress
+                        updateBackgroundColor(seekBar, progress, 2)
+                        updateBackgroundColor(colorPopupBinding.redLayout.seekBar, progress, 1)
+                        updateBackgroundColor(colorPopupBinding.blueLayout.seekBar, progress, 3)
+                    }
+                    if (type == "B") {
+                        blue = progress
+                        updateBackgroundColor(seekBar, progress, 3)
+                        updateBackgroundColor(colorPopupBinding.redLayout.seekBar, progress, 1)
+                        updateBackgroundColor(colorPopupBinding.greenLayout.seekBar, progress, 2)
+                    }
+                    if (type == "Opacity") {
+                        var opacity = seekBar.progress*100 /255
+                        colorTxt.text = opacity.toString() + " %"
+                    }
+
+                    // Set thumb color
+
+                    colorPopupBinding.redLayout.seekBar.getThumb().setTint(seekbar_color)
+                    colorPopupBinding.greenLayout.seekBar.getThumb().setTint(seekbar_color)
+                    colorPopupBinding.blueLayout.seekBar.getThumb().setTint(seekbar_color)
+
                 }
                 setRGBColor()
                 glSurfaceView.requestRender(ActionType.COLOR)
@@ -446,8 +503,63 @@ class MainActivity : AppCompatActivity() {
 
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
+
         colorTxt.text = seekBar.progress.toString()
+
+
     }
+    private fun updateBackgroundColor(seekBar: SeekBar, progress: Int, type: Int) {
+        val layerDrawable = seekBar.progressDrawable as LayerDrawable
+        val backgroundIndex = 0
+        val trackIndex = 2
+
+        // Disable gradient for the background
+        layerDrawable.getDrawable(backgroundIndex).setTintMode(PorterDuff.Mode.SRC)
+
+        val colorBackground = calculateBackgroundColor(progress, type)
+        layerDrawable.getDrawable(backgroundIndex).setTint(colorBackground)
+
+        val colorTrack = calculateTrackColor(progress,type)
+        layerDrawable.getDrawable(trackIndex).setTint(colorTrack)
+
+    }
+
+    private fun calculateBackgroundColor(progress: Int, type: Int): Int {
+        // Calculate the background color based on the progress
+        // For example, you can create a gradient or use a specific color logic
+        // Here, a simple example of changing color based on the progress is provided
+
+        if (type == 1 ) {
+            return android.graphics.Color.rgb(255, green, blue)
+
+        }
+       if (type == 2 ) {
+           return android.graphics.Color.rgb(red, 255, blue)
+
+       }else{
+           return android.graphics.Color.rgb(red, green, 255)
+       }
+
+    }
+    private fun calculateTrackColor(progress: Int, type: Int): Int {
+        // Calculate the background color based on the progress
+        // For example, you can create a gradient or use a specific color logic
+        // Here, a simple example of changing color based on the progress is provided
+
+        if (type == 1 ) {
+            return android.graphics.Color.rgb(0, green, blue)
+
+        }
+        if (type == 2 ) {
+            return android.graphics.Color.rgb(red, 0, blue)
+
+        }else{
+            return android.graphics.Color.rgb(red, green, 0)
+        }
+
+    }
+
+
 
     private fun setRGBColor() {
         color = floatArrayOf(

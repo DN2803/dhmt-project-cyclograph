@@ -21,7 +21,8 @@ class GLESRenderer: GLSurfaceView.Renderer {
         // Set the background frame color
         GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f)
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
-
+        GLES20.glEnable(GLES20.GL_BLEND)
+        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA,GLES20.GL_ONE_MINUS_SRC_ALPHA)
 //        var tVertices = mutableListOf<Vertex>()
 //        tVertices.add(Vertex(0.0f, 1f, 0.0f))
 //        tVertices.add(Vertex(-1080/1640f, -1f, 0.0f))
@@ -134,7 +135,7 @@ class GLESRenderer: GLSurfaceView.Renderer {
                 if (!activeList[j]){
                     continue
                 }
-                clearCloneShapeOf(j)
+                //clearCloneShapeOf(j)
                 var newVertices = mutableListOf<Vertex>()
 
                 for (vertex in shapes[j].vertices){
