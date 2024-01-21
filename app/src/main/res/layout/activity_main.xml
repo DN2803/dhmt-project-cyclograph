@@ -14,7 +14,8 @@
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/scrollView2" />
+        app:layout_constraintTop_toBottomOf="@+id/scrollView2"
+        android:background="@drawable/border_backgroud"/>
 
 
     <HorizontalScrollView
@@ -23,7 +24,7 @@
         android:layout_height="60dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:contentDescription="For layer list view" >
+        android:contentDescription="For layer list view">
 
         <LinearLayout
             android:id="@+id/layerList"
@@ -123,7 +124,8 @@
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:layout_gravity="center"
-                    android:paddingRight="15dp"
+
+
                     android:background="@drawable/btn_primary"
                     android:contentDescription="generate cyclograph"
                     android:scaleType="fitCenter"
@@ -131,8 +133,8 @@
                     android:src="@mipmap/right_arrow" />
                 <ImageButton
                     android:id="@+id/btn_download"
-                    android:layout_width="40dp"
-                    android:layout_height="35dp"
+                    android:layout_width="50dp"
+                    android:layout_height="40dp"
                     android:layout_gravity="center"
                     android:background="@drawable/btn_primary"
                     android:contentDescription="Download_Image"
