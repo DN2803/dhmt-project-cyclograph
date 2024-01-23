@@ -1,17 +1,15 @@
 package com.cg76.drawingapp
 
-import android.annotation.SuppressLint
 import android.app.Dialog
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.PorterDuff
+import android.graphics.SurfaceTexture
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
-import android.view.MotionEvent
 import android.view.View
-import android.view.animation.Animation
-import android.view.animation.ScaleAnimation
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.LinearLayout
@@ -27,11 +25,16 @@ import com.cg76.drawingapp.databinding.GenerCycloPopupBinding
 import com.cg76.drawingapp.databinding.ShapePopupBinding
 import com.cg76.drawingapp.databinding.StrokePopupBinding
 import android.graphics.drawable.LayerDrawable
-import android.graphics.drawable.ShapeDrawable
-import android.graphics.drawable.shapes.RectShape
+import android.os.Environment
+import android.view.PixelCopy
+import android.view.Surface
 import android.widget.GridLayout
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.get
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 
 
 class MainActivity : AppCompatActivity() {
@@ -783,6 +786,57 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun exportImageFromGLSurfaceView() {
+        val bitmap = Bitmap.createBitmap(glSurfaceView.width, glSurfaceView.height, Bitmap.Config.ARGB_8888)
+        val surfaceTexture = SurfaceTexture(0)
+        val surface = Surface(surfaceTexture)
+
+        // Chạy PixelCopy để sao chép nội dung của GLSurfaceView vào Bitmap
+        PixelCopy.request(surface, bitmap, { copyResult ->
+            if (copyResult == PixelCopy.SUCCESS) {
+                // Lưu Bitmap xuống tệp tin hoặc thực hiện các xử lý khác
+                saveBitmapToFile(bitmap)
+            } else {
+                Toast.makeText(
+                    this,
+                    "Không thể xuất ảnh từ GLSurfaceView",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+            // Đóng SurfaceTexture và Surface sau khi sử dụng
+            surfaceTexture.release()
+            surface.release()
+        }, glSurfaceView.handler)
+    }
+
+    private fun saveBitmapToFile(bitmap: Bitmap) {
+        val storageDir = File(
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
+            "YourAppName"
+        )
+        storageDir.mkdirs()
+
+        val imageFile = File(storageDir, "output_image.png")
+
+        try {
+            FileOutputStream(imageFile).use { out ->
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+                Toast.makeText(
+                    this,
+                    "Đã lưu ảnh tại: ${imageFile.absolutePath}",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+            Toast.makeText(
+                this,
+                "Lỗi khi lưu ảnh",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
 
 }
 
