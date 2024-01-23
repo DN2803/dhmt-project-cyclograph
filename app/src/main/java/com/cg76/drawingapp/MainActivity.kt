@@ -803,11 +803,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun saveBitmapToFile(bitmap: Bitmap) {
+        val albumName = "CycloGraph Application"
         val storageDir = File(
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
-            "Cyclograph"
+            albumName
         )
-        storageDir.mkdirs()
+
+        // Create the album directory if it doesn't exist
+        if (!storageDir.exists()) {
+            if (!storageDir.mkdirs()) {
+                Log.e("YourAppName", "Failed to create directory: $albumName")
+                return
+            }
+        }
 
         val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
         val imageFileName = "output_image_$timeStamp.png"
