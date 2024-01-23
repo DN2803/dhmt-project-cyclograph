@@ -94,6 +94,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var strokePickerButton: ImageButton
     private lateinit var GenerateButton: ImageButton
     private lateinit var affinePickerButton: ImageButton
+    private lateinit var saveButton: ImageButton
+
 
     private val colorPopupBinding: ColorPopupBinding by lazy {
         ColorPopupBinding.inflate(layoutInflater)
@@ -130,6 +132,8 @@ class MainActivity : AppCompatActivity() {
         strokePickerButton = findViewById<ImageButton>(R.id.btn_stroke)
         GenerateButton = findViewById<ImageButton>(R.id.btn_cyclo)
         affinePickerButton = findViewById<ImageButton>(R.id.btn_affine)
+        saveButton = findViewById<ImageButton>(R.id.btn_download)
+
         actionButtons.addAll(
             listOf(
                 shapePickerButton,
@@ -139,6 +143,7 @@ class MainActivity : AppCompatActivity() {
                 affinePickerButton
             )
         )
+
 
         onButtonClicked(shapePickerButton)
         isDrawAction = true
