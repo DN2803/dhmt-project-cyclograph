@@ -467,7 +467,6 @@ class MainActivity : AppCompatActivity() {
 
             copies = setCopies()
             // call redraw
-
             glSurfaceView.requestRender(ActionType.GENCYCLO)
 
             generPopup.dismiss()
@@ -655,7 +654,9 @@ class MainActivity : AppCompatActivity() {
                 if (seekBar != null) {
                     value.text = seekBar.progress.toString()
                 }
-                glSurfaceView.requestRender(actionType)
+                if (actionType != ActionType.GENCYCLO) {
+                    glSurfaceView.requestRender(actionType)
+                }
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
