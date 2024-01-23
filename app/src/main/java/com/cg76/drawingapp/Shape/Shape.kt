@@ -67,8 +67,10 @@ abstract class Shape(
         private const val vertexShaderCode =
             "uniform mat4 uMVPMatrix;" +
                     "attribute vec4 vPosition;" +
+                    "attribute float a_PointSize;" +
                     "void main() {" +
                     "  gl_Position = uMVPMatrix * vPosition;" +
+                    "  gl_PointSize = a_PointSize;" +
                     "}"
 
         private const val fragmentShaderCode =
@@ -125,6 +127,7 @@ abstract class Shape(
     // draw method
     private var positionHandle: Int = 0
     private var mColorHandle: Int = 0
+    private var pointSizeHandle: Int = 0
 
     private val vertexStride: Int = Vertex.COORDS_PER_VERTEX * 4 // 4 bytes per vertex
 
@@ -137,10 +140,10 @@ abstract class Shape(
         // get handle to vertex shader's vPosition member
         positionHandle = GLES20.glGetAttribLocation(mProgram, "vPosition").also {
 
-            // Enable a handle to the triangle vertices
+            // Enable a handle to the shape vertices
             GLES20.glEnableVertexAttribArray(it)
 
-            // Prepare the triangle coordinate data
+            // Prepare the shape coordinate data
             GLES20.glVertexAttribPointer(
                 it,
                 Vertex.COORDS_PER_VERTEX,
@@ -157,6 +160,8 @@ abstract class Shape(
                 GLES20.glUniform4fv(colorHandle, 1, _color, 0)
             }
 
+            pointSizeHandle= GLES20.glGetAttribLocation(mProgram, "a_PointSize")
+
             // get handle to shape's transformation matrix
             vPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix")
 
@@ -165,6 +170,7 @@ abstract class Shape(
 
             // Draw the shape
             GLES20.glLineWidth(_size)
+            GLES20.glVertexAttrib1f(pointSizeHandle, size)
             GLES20.glDrawArrays(mode, 0, _vertexCount)
 
             // Disable vertex array

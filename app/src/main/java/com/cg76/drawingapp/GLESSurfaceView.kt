@@ -4,10 +4,13 @@ import android.content.Context
 import android.opengl.GLSurfaceView
 import android.util.AttributeSet
 import android.view.MotionEvent
+import com.cg76.drawingapp.MainActivity.Companion.activeList
 import com.cg76.drawingapp.MainActivity.Companion.addLayerButton
 import com.cg76.drawingapp.MainActivity.Companion.color
+import com.cg76.drawingapp.MainActivity.Companion.copies
 import com.cg76.drawingapp.MainActivity.Companion.isDrawAction
 import com.cg76.drawingapp.MainActivity.Companion.shapeType
+import com.cg76.drawingapp.MainActivity.Companion.stroke
 import com.cg76.drawingapp.Shape.*
 import com.cg76.drawingapp.Shape.ActionType.*
 
@@ -19,7 +22,6 @@ class GLESSurfaceView @JvmOverloads constructor(
     companion object{
         lateinit var renderer: GLESRenderer
         val factory = BuilderFactory()
-        var size = 15f
         var beforeGenShapeCount = 0
     }
 
@@ -71,6 +73,7 @@ class GLESSurfaceView @JvmOverloads constructor(
         val pointerCount = e.pointerCount
         when (e.action and MotionEvent.ACTION_MASK) {
             MotionEvent.ACTION_DOWN -> {
+                queueEvent { renderer.initShapeListAt(beforeGenShapeCount)}
                 startPoint = floatArrayOf(e.x, e.y)
                 performClick()
             }
@@ -79,10 +82,10 @@ class GLESSurfaceView @JvmOverloads constructor(
                     endPoint = floatArrayOf(e.x, e.y)
 
                     var builder = factory.select(type)
-                    var shape = builder?.build(startPoint,endPoint, color, size)
+                    var shape = builder?.build(startPoint,endPoint, color, stroke)
 
                     queueEvent {
-                        renderer.addShape(shape, true)
+                        renderer.addShapeAt(beforeGenShapeCount, shape, true)
                     }
                     requestRender()
                 }
@@ -93,9 +96,9 @@ class GLESSurfaceView @JvmOverloads constructor(
 
                 if (endPoint != startPoint) {
                     var builder = factory.select(type)
-                    var shape = builder?.build(startPoint,endPoint, color, size)
+                    var shape = builder?.build(startPoint,endPoint, color, stroke)
 
-                    queueEvent { renderer.addShape(shape) }
+                    queueEvent { renderer.addShapeAt(beforeGenShapeCount, shape) }
                     requestRender()
                     addLayerButton()
                     beforeGenShapeCount++
@@ -149,9 +152,14 @@ class GLESSurfaceView @JvmOverloads constructor(
     }
 
     private fun genCycloGraph() {
-        queueEvent {
-            renderer.generateCyclograph(MainActivity.copies)
+
+        for (i in 0..<activeList.size){
+            if (activeList[i])
+                queueEvent {
+                    renderer.generateCyclograph(i, copies)
+                }
         }
+
         requestRender()
     }
 

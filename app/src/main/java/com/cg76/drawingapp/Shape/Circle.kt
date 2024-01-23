@@ -143,7 +143,7 @@ class CircleBuilder: ShapeBuilder{
         color: FloatArray,
         size: Float
     ): Shape {
-        return Circle(364, vertices, color, size)
+        return Circle(vertexCount, vertices, color, size)
     }
 }
 
@@ -184,6 +184,6 @@ class ElipseBuilder: ShapeBuilder{
         color: FloatArray,
         size: Float
     ): Shape {
-        return Circle(364, vertices, color, size)
+        return Circle(vertexCount, vertices, color, size)
     }
 }

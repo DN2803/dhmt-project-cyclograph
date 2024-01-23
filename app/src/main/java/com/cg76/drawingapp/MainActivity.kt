@@ -31,6 +31,7 @@ import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.shapes.RectShape
 import android.widget.GridLayout
 import androidx.core.content.ContextCompat
+import androidx.core.view.get
 
 
 class MainActivity : AppCompatActivity() {
@@ -38,7 +39,7 @@ class MainActivity : AppCompatActivity() {
     companion object {
         var isDrawAction = false
         var shapeType = ShapeType.LINE
-        var stroke: Float = 1f
+        var stroke: Float = 7f
         var color = floatArrayOf(0f, 0f, 0f, 1f)
         var copies: Int = 0
         lateinit var glSurfaceView: GLESSurfaceView
@@ -67,7 +68,7 @@ class MainActivity : AppCompatActivity() {
 
             newButton.id = buttonCount
             buttonCount++
-            newButton.text = "Layer $buttonCount"
+            newButton.text = "Sample $buttonCount"
             newButton.setBackgroundColor(0xFFFFFFFF.toInt())
 
             newButton.setOnClickListener {
@@ -564,8 +565,7 @@ class MainActivity : AppCompatActivity() {
 
                 }
                 setRGBColor()
-                glSurfaceView.requestRender(ActionType.COLOR)
-                //glSurfaceView.requestRender(actionType)
+                glSurfaceView.requestRender(actionType)
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -760,14 +760,6 @@ class MainActivity : AppCompatActivity() {
         clickedButton.setBackgroundColor(0xFFA9A9A9.toInt())
     }
 
-    private fun deselectAllLayer(){
-        //TODO
-        for (i in 0..<activeList.size){
-            activeList[i] = false
-
-        }
-    }
-
 
     private fun clearSelection(colorGrid: GridLayout) {
         for (i in 0 until colorGrid.childCount) {
@@ -783,6 +775,14 @@ class MainActivity : AppCompatActivity() {
         // Set the checkmark drawable as a compound drawable on the button
         colorButton.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, checkmarkDrawable, null)
     }
+
+    private fun deselectAllLayer(){
+        for (i in 0..<activeList.size){
+            activeList[i] = false
+            layerList[i].setBackgroundColor(0xFFFFFFFF.toInt())
+        }
+    }
+
 
 }
 

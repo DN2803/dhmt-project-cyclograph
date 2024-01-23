@@ -15,7 +15,17 @@ import kotlin.math.sin
 
 class GLESRenderer: GLSurfaceView.Renderer {
 
-    private var shapes = mutableListOf<Shape>()
+    private var shapeLists = mutableListOf(mutableListOf<Shape>())
+    private var xAxis = Line(
+        2,
+        mutableListOf(Vertex(-1f,0f), Vertex(1f,0f)),
+        floatArrayOf(0f,0f,0f,0.4f),
+        3f)
+    private var yAxis = Line(
+        2,
+        mutableListOf(Vertex(0f,-1f), Vertex(0f,1f)),
+        floatArrayOf(0f,0f,0f,0.4f),
+        3f)
 
     override fun onSurfaceCreated(unused: GL10, config: EGLConfig) {
         // Set the background frame color
@@ -23,13 +33,11 @@ class GLESRenderer: GLSurfaceView.Renderer {
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
         GLES20.glEnable(GLES20.GL_BLEND)
         GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA,GLES20.GL_ONE_MINUS_SRC_ALPHA)
-//        var tVertices = mutableListOf<Vertex>()
-//        tVertices.add(Vertex(0.0f, 1f, 0.0f))
-//        tVertices.add(Vertex(-1080/1640f, -1f, 0.0f))
-//        tVertices.add(Vertex(1080/1640f, -1f, 0.0f))
-//        var mTriangle = Triangle(3,tVertices, RED,15f)
-//
-//        this.addShape(mTriangle)
+
+        xAxis.createProgram()
+        yAxis.createProgram()
+        shapeLists.add(mutableListOf(xAxis,yAxis))
+
     }
 
     // vPMatrix is an abbreviation for "Model View Projection Matrix"
@@ -59,8 +67,10 @@ class GLESRenderer: GLSurfaceView.Renderer {
         // for the matrix multiplication product to be correct.
         Matrix.multiplyMM(scratch, 0, vPMatrix, 0, rotationMatrix, 0)
 
-        for(shape in shapes){
-            shape.draw(scratch, shape.drawMode)
+        for(list in shapeLists){
+            for (shape in list){
+                shape.draw(scratch, shape.drawMode)
+            }
         }
     }
 
@@ -83,77 +93,67 @@ class GLESRenderer: GLSurfaceView.Renderer {
         viewHeight = height
     }
 
-    private fun cleanShapes() {
-        for (shape in shapes){
-            if (shape.isTemp){
-                shapes.remove(shape)
+    private fun cleanShapesAt(index: Int) {
+        var i = 0
+        while (i < shapeLists[index].size) {
+            if (shapeLists[index][i].isTemp){
+                shapeLists[index].removeAt(i)
+            }
+            else {
+                i++
             }
         }
     }
 
+    fun initShapeListAt(index: Int){
+        shapeLists.add(index, mutableListOf())
+    }
 
-    fun addShape(shape: Shape?, isTemp: Boolean=false, wasGenCyclo: Boolean=false){
-        cleanShapes()
+    fun addShapeAt(index: Int, shape: Shape?, isTemp: Boolean=false){
+        cleanShapesAt(index)
 
         if (shape != null){
             shape.createProgram()
             shape.isTemp = isTemp
-
-            if (wasGenCyclo){
-                for (i in 0..<shapes.size)
-                    if (shapes[i].isClone) shapes.add(i,shape)
-            }
-            else
-                shapes.add(shape)
+            shapeLists[index].add(shape)
         }
     }
 
-    fun updateShapeAt(transMatrix: FloatArray, id: Int){
-        if (id !in 0..<shapes.size) return
-
-
+    private fun clearCloneShapesAt(index: Int) {
+        while (1 < shapeLists[index].size){
+            shapeLists[index].removeAt(1)
+        }
     }
 
-//    private fun clearCloneShapeOf(index: Int) {
-//        var i = index
-//
-//        while (i < shapes.size){
-//            shapes.removeAt(index)
-//            i += beforeGenShapeCount - 1
-//        }
-//    }
-
-    fun generateCyclograph(copies: Int){
+    fun generateCyclograph(index: Int, copies: Int){
+        clearCloneShapesAt(index)
         val delta = 2*PI.toFloat()/copies
         var angle = delta
 
         var cosTheta = cos(angle)
         var sinTheta = sin(angle)
 
+        val sample = shapeLists[index][0]
+
         for (i in 1..<copies){
-            for (j in 0..<activeList.size){
-                if (!activeList[j]){
-                    continue
-                }
-                //clearCloneShapeOf(j)
-                var newVertices = mutableListOf<Vertex>()
 
-                for (vertex in shapes[j].vertices){
-                    val newX = cosTheta * vertex.x - sinTheta * vertex.y
-                    val newY = sinTheta * vertex.x + cosTheta * vertex.y
-                    newVertices.add(Vertex(newX,newY))
-                }
+            var newVertices = mutableListOf<Vertex>()
 
-                var builder = GLESSurfaceView.factory.select(shapes[j].type)
-                var newShape = builder?.build(
-                    shapes[j].vertexCount,
-                    newVertices,
-                    shapes[j].color,
-                    shapes[j].size)
-                if (newShape != null) {
-                    newShape.isClone = true
-                    this.addShape(newShape)
-                }
+            for (vertex in sample.vertices){
+                val newX = cosTheta * vertex.x - sinTheta * vertex.y
+                val newY = sinTheta * vertex.x + cosTheta * vertex.y
+                newVertices.add(Vertex(newX,newY))
+            }
+
+            var builder = GLESSurfaceView.factory.select(sample.type)
+            var newShape = builder?.build(
+                sample.vertexCount,
+                newVertices,
+                sample.color,
+                sample.size)
+
+            if (newShape != null) {
+                this.addShapeAt(index, newShape)
             }
 
             angle+=delta
@@ -161,16 +161,14 @@ class GLESRenderer: GLSurfaceView.Renderer {
             sinTheta = sin(angle)
         }
 
-
-        // draw
     }
 
     fun colorShape(){
-        for (i in 0..<activeList.size){
-            if (activeList[i]){
-                shapes[i].color = color
-            }
-        }
+//        for (i in 0..<activeList.size){
+//            if (activeList[i]){
+//                shapes[i].color = color
+//            }
+//        }
     }
 
     fun scaleShape(){
