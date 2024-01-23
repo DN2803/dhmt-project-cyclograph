@@ -41,6 +41,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.get
 import com.cg76.drawingapp.GLESSurfaceView.Companion.bitmap
+import com.cg76.drawingapp.databinding.MenuPopupBinding
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -67,6 +68,7 @@ class MainActivity : AppCompatActivity() {
         var H_sheer = 0f
 
         lateinit var layerList: LinearLayout
+        lateinit var customShapeLayout: LinearLayout
         var activeList = mutableListOf<Boolean>()
         var context: MainActivity? = null
         private var buttonCount = 0
@@ -100,7 +102,11 @@ class MainActivity : AppCompatActivity() {
             layerList.addView(newButton)
 
         }
+
+
+
     }
+
 
     private val actionButtons = mutableListOf<ImageButton>()
 
@@ -109,8 +115,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var strokePickerButton: ImageButton
     private lateinit var GenerateButton: ImageButton
     private lateinit var affinePickerButton: ImageButton
-    private lateinit var saveButton: ImageButton
-
+    //private lateinit var saveButton: ImageButton
+    private lateinit var menuButton: ImageButton
 
     private val colorPopupBinding: ColorPopupBinding by lazy {
         ColorPopupBinding.inflate(layoutInflater)
@@ -128,7 +134,9 @@ class MainActivity : AppCompatActivity() {
     private val affinePopupBinding: AffinePopupBinding by lazy {
         AffinePopupBinding.inflate(layoutInflater)
     }
-
+    private val menuPopupBinding: MenuPopupBinding by lazy {
+        MenuPopupBinding.inflate(layoutInflater)
+    }
 
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -147,8 +155,8 @@ class MainActivity : AppCompatActivity() {
         strokePickerButton = findViewById<ImageButton>(R.id.btn_stroke)
         GenerateButton = findViewById<ImageButton>(R.id.btn_cyclo)
         affinePickerButton = findViewById<ImageButton>(R.id.btn_affine)
-        saveButton = findViewById<ImageButton>(R.id.btn_download)
-
+        //saveButton = findViewById<ImageButton>(R.id.btn_download)
+        menuButton = findViewById<ImageButton>(R.id.btn_menu)
         actionButtons.addAll(
             listOf(
                 shapePickerButton,
@@ -159,15 +167,41 @@ class MainActivity : AppCompatActivity() {
             )
         )
 
-        saveButton.setOnClickListener {
+
+        val menuPopup = Dialog(this).apply {
+            setContentView(menuPopupBinding.root)
+
+            window!!.setLayout(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+
+            )
+            // Set the X and Y position of the dialog
+            val layoutParams = window!!.attributes
+            layoutParams.gravity = Gravity.TOP
+            layoutParams.dimAmount = 0.0f
+            window!!.setBackgroundDrawable(ColorDrawable(Color.argb(0, 0, 0, 0)))
+            setCancelable(true)
+        }
+
+        menuButton.setOnClickListener{
+            menuPopup.show()
+        }
+        menuPopupBinding.download.setOnClickListener{
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 bitmap?.let { it1 -> saveBitmapToDCIM(it1) }
             } else {
                 // Nếu thiết bị chạy dưới Android 10
                 bitmap?.let { it1 -> saveBitmapToFile(it1) }
             }
-
+            menuPopup.dismiss()
         }
+        menuPopupBinding.root.setOnClickListener{
+            menuPopup.dismiss()
+        }
+        // button create sample
+        // menuPopupBinding
+
 
         onButtonClicked(shapePickerButton)
         isDrawAction = true
@@ -186,6 +220,8 @@ class MainActivity : AppCompatActivity() {
             layoutParams.gravity = Gravity.BOTTOM
             layoutParams.dimAmount = 0.0f
             window!!.setBackgroundDrawable(ColorDrawable(Color.argb(0, 0, 0, 0)))
+
+
 
             setCancelable(true)
         }
@@ -225,7 +261,10 @@ class MainActivity : AppCompatActivity() {
             layoutParams.gravity = Gravity.BOTTOM
             layoutParams.dimAmount = 0.0f
             window!!.setBackgroundDrawable(ColorDrawable(Color.argb(0, 0, 0, 0)))
-
+//            val bottomMarginInDp = 50
+//            val scale = resources.displayMetrics.density
+//            val bottomMarginInPixels = (bottomMarginInDp * scale + 0.5f).toInt()
+//            layoutParams.y = bottomMarginInPixels
 
             setCancelable(true)
 

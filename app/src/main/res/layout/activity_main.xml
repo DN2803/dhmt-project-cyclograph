@@ -12,143 +12,158 @@
         android:id="@+id/glSurfaceView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:background="@drawable/border_backgroud"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/scrollView2"
-        android:background="@drawable/border_backgroud"/>
+        app:layout_constraintTop_toBottomOf="@+id/mainLayout" />
 
-
-    <HorizontalScrollView
-        android:id="@+id/scrollView2"
+    <LinearLayout
+        android:id="@id/mainLayout"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:contentDescription="For layer list view">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent">
 
-        <LinearLayout
-            android:id="@+id/layerList"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
 
-        </LinearLayout>
-    </HorizontalScrollView>
+        <HorizontalScrollView
+            android:id="@+id/scrollView2"
+            android:layout_width="357dp"
+            android:layout_height="50dp"
+            android:background="@color/white"
+            android:contentDescription="For layer list view"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <LinearLayout
+                android:id="@+id/layerList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+            </LinearLayout>
+
+        </HorizontalScrollView>
+
+        <ImageButton
+            android:id="@+id/btn_menu"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:background="@drawable/btn_primary"
+            android:contentDescription="Menu"
+            android:paddingTop="10dp"
+            android:paddingRight="10dp"
+            android:paddingBottom="8dp"
+            android:scaleType="fitEnd"
+            android:src="@mipmap/icons_menu"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+
+    </LinearLayout>
+
 
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/white"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent">
+
+
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:id="@+id/navigate"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:gravity="center"
             android:orientation="horizontal"
-            android:weightSum="3">
-            <HorizontalScrollView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="3">
-                <LinearLayout
-                    android:id="@+id/navigate"
-                    android:layout_width="wrap_content"
-                    android:layout_height="50dp"
-                    android:gravity="center"
-                    android:orientation="horizontal"
-                    android:paddingLeft="10dp"
-                    android:paddingRight="10dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    android:visibility="visible">
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
 
-                    <ImageButton
-                        android:id="@+id/btn_draw"
-                        android:layout_width="70dp"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="center"
-                        android:layout_weight="1"
-                        android:background="@drawable/btn_primary"
-                        android:contentDescription="draw shapes"
-                        android:padding="10dp"
-                        android:scaleType="fitCenter"
-                        android:src="@mipmap/paint_brush" />
-
-                    <ImageButton
-                        android:id="@+id/btn_colors"
-                        android:layout_width="70dp"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="center"
-                        android:layout_weight="1"
-                        android:background="@drawable/btn_primary"
-                        android:contentDescription="choose color to draw"
-                        android:padding="10dp"
-                        android:scaleType="fitCenter"
-                        android:src="@mipmap/color_wheel" />
-
-
-                    <ImageButton
-                        android:id="@+id/btn_stroke"
-                        android:layout_width="70dp"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="center"
-                        android:layout_weight="1"
-                        android:background="@drawable/btn_primary"
-                        android:contentDescription="pick stroke"
-                        android:padding="10dp"
-                        android:scaleType="fitCenter"
-                        android:src="@mipmap/stroke" />
-
-                    <ImageButton
-                        android:id="@+id/btn_affine"
-                        android:layout_width="70dp"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="center"
-                        android:layout_weight="1"
-                        android:background="@drawable/btn_primary"
-                        android:contentDescription="pick shape for affine"
-                        android:padding="10dp"
-                        android:scaleType="fitCenter"
-                        android:src="@mipmap/icons8_layer" />
-
-
-                </LinearLayout>
-            </HorizontalScrollView>
-            <LinearLayout
-                android:layout_width="wrap_content"
+            <ImageButton
+                android:id="@+id/btn_draw"
+                android:layout_width="70dp"
                 android:layout_height="match_parent"
-                android:layout_weight="2">
-                <ImageButton
-                    android:id="@+id/btn_cyclo"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_gravity="center"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:background="@drawable/btn_primary"
+                android:contentDescription="draw shapes"
+                android:padding="10dp"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/paint_brush" />
+
+            <ImageButton
+                android:id="@+id/btn_colors"
+                android:layout_width="70dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:background="@drawable/btn_primary"
+                android:contentDescription="choose color to draw"
+                android:padding="10dp"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/color_wheel" />
 
 
-                    android:background="@drawable/btn_primary"
-                    android:contentDescription="generate cyclograph"
-                    android:scaleType="fitCenter"
+            <ImageButton
+                android:id="@+id/btn_stroke"
+                android:layout_width="70dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:background="@drawable/btn_primary"
+                android:contentDescription="pick stroke"
+                android:padding="10dp"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/stroke" />
 
-                    android:src="@mipmap/right_arrow" />
-                <ImageButton
-                    android:id="@+id/btn_download"
-                    android:layout_width="50dp"
-                    android:layout_height="40dp"
-                    android:layout_gravity="center"
-                    android:background="@drawable/btn_primary"
-                    android:contentDescription="Download_Image"
-                    android:paddingTop="8dp"
-                    android:paddingBottom="8dp"
-                    android:paddingRight="15dp"
-                    android:scaleType="fitEnd"
+            <ImageButton
+                android:id="@+id/btn_affine"
+                android:layout_width="70dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:background="@drawable/btn_primary"
+                android:contentDescription="pick shape for affine"
+                android:padding="10dp"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/icons8_layer" />
 
-                    android:src="@mipmap/download"/>
-            </LinearLayout>
+            <ImageButton
+                android:id="@+id/deleteSample"
+                android:layout_width="70dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center"
+                android:background="@drawable/btn_primary"
+                android:contentDescription="delete sample"
+                android:padding="10dp"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/garbage" />
+
+            <ImageButton
+                android:id="@+id/btn_cyclo"
+                android:layout_width="70dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+
+                android:layout_weight="1"
+                android:background="@drawable/btn_primary"
+                android:contentDescription="generate cyclograph"
+                android:scaleType="fitCenter"
+
+
+                android:src="@mipmap/right_arrow" />
+
 
         </LinearLayout>
 
+
     </LinearLayout>
+
 
 
 
