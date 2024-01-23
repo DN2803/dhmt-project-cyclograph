@@ -1,17 +1,19 @@
 package com.cg76.drawingapp
-import javax.microedition.khronos.egl.EGLConfig
-import javax.microedition.khronos.opengles.GL10
 
+import android.graphics.Bitmap
 import android.opengl.GLES20
+import android.opengl.GLException
 import android.opengl.GLSurfaceView
 import android.opengl.Matrix
-import com.cg76.drawingapp.GLESSurfaceView.Companion.beforeGenShapeCount
-import com.cg76.drawingapp.MainActivity.Companion.activeList
-import com.cg76.drawingapp.MainActivity.Companion.color
+import com.cg76.drawingapp.GLESSurfaceView.Companion.bitmap
 import com.cg76.drawingapp.Shape.*
+import java.nio.IntBuffer
+import javax.microedition.khronos.egl.EGLConfig
+import javax.microedition.khronos.opengles.GL10
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
+
 
 class GLESRenderer: GLSurfaceView.Renderer {
 
@@ -37,6 +39,7 @@ class GLESRenderer: GLSurfaceView.Renderer {
         xAxis.createProgram()
         yAxis.createProgram()
         shapeLists.add(mutableListOf(xAxis,yAxis))
+        shapeLists.removeFirst()
 
     }
 
@@ -67,11 +70,20 @@ class GLESRenderer: GLSurfaceView.Renderer {
         // for the matrix multiplication product to be correct.
         Matrix.multiplyMM(scratch, 0, vPMatrix, 0, rotationMatrix, 0)
 
-        for(list in shapeLists){
-            for (shape in list){
+        for (i in 0 until shapeLists.size - 1){
+            for (shape in shapeLists[i]){
                 shape.draw(scratch, shape.drawMode)
             }
         }
+
+        bitmap = createBitmapFromGLSurface()
+
+        for (shape in shapeLists.last()){
+            shape.draw(scratch, shape.drawMode)
+        }
+
+
+
     }
 
     companion object{
@@ -189,6 +201,35 @@ class GLESRenderer: GLSurfaceView.Renderer {
 
     fun shearShape(){
 
+    }
+
+    @Throws(OutOfMemoryError::class)
+    private fun createBitmapFromGLSurface(): Bitmap? {
+        val w = viewWidth
+        val h = viewHeight
+        val bitmapBuffer = IntArray(w * h)
+        val bitmapSource = IntArray(w * h)
+        val intBuffer = IntBuffer.wrap(bitmapBuffer)
+        intBuffer.position(0)
+        try {
+            GLES20.glReadPixels(0, 0, w, h, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, intBuffer)
+            var offset1: Int
+            var offset2: Int
+            for (i in 0 until h) {
+                offset1 = i * w
+                offset2 = (h - i - 1) * w
+                for (j in 0 until w) {
+                    val texturePixel = bitmapBuffer[offset1 + j]
+                    val blue = texturePixel shr 16 and 0xff
+                    val red = texturePixel shl 16 and 0x00ff0000
+                    val pixel = texturePixel and -0xff0100 or red or blue
+                    bitmapSource[offset2 + j] = pixel
+                }
+            }
+        } catch (e: GLException) {
+            return null
+        }
+        return Bitmap.createBitmap(bitmapSource, w, h, Bitmap.Config.ARGB_8888)
     }
 }
 

@@ -1,9 +1,14 @@
 package com.cg76.drawingapp
 import android.content.Context
+import android.graphics.Bitmap
+import android.opengl.GLES20
 
 import android.opengl.GLSurfaceView
+import android.os.Environment
 import android.util.AttributeSet
+import android.util.Log
 import android.view.MotionEvent
+import android.widget.Toast
 import com.cg76.drawingapp.MainActivity.Companion.activeList
 import com.cg76.drawingapp.MainActivity.Companion.addLayerButton
 import com.cg76.drawingapp.MainActivity.Companion.color
@@ -13,6 +18,10 @@ import com.cg76.drawingapp.MainActivity.Companion.shapeType
 import com.cg76.drawingapp.MainActivity.Companion.stroke
 import com.cg76.drawingapp.Shape.*
 import com.cg76.drawingapp.Shape.ActionType.*
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.nio.ByteBuffer
 
 class GLESSurfaceView @JvmOverloads constructor(
     context: Context,
@@ -23,6 +32,7 @@ class GLESSurfaceView @JvmOverloads constructor(
         lateinit var renderer: GLESRenderer
         val factory = BuilderFactory()
         var beforeGenShapeCount = 0
+        var bitmap: Bitmap? = null
     }
 
     init {
@@ -204,4 +214,6 @@ class GLESSurfaceView @JvmOverloads constructor(
 
         requestRender()
     }
+
+
 }

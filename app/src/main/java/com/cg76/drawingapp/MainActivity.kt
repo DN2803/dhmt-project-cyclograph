@@ -25,16 +25,20 @@ import com.cg76.drawingapp.databinding.GenerCycloPopupBinding
 import com.cg76.drawingapp.databinding.ShapePopupBinding
 import com.cg76.drawingapp.databinding.StrokePopupBinding
 import android.graphics.drawable.LayerDrawable
+import android.opengl.GLES20
 import android.os.Environment
+import android.util.Log
 import android.view.PixelCopy
 import android.view.Surface
 import android.widget.GridLayout
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.get
+import com.cg76.drawingapp.GLESSurfaceView.Companion.bitmap
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import java.nio.ByteBuffer
 
 
 class MainActivity : AppCompatActivity() {
@@ -147,6 +151,9 @@ class MainActivity : AppCompatActivity() {
             )
         )
 
+        saveButton.setOnClickListener {
+            bitmap?.let { it1 -> saveBitmapToFile(it1) }
+        }
 
         onButtonClicked(shapePickerButton)
         isDrawAction = true
@@ -792,34 +799,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun exportImageFromGLSurfaceView() {
-        val bitmap = Bitmap.createBitmap(glSurfaceView.width, glSurfaceView.height, Bitmap.Config.ARGB_8888)
-        val surfaceTexture = SurfaceTexture(0)
-        val surface = Surface(surfaceTexture)
-
-        // Chạy PixelCopy để sao chép nội dung của GLSurfaceView vào Bitmap
-        PixelCopy.request(surface, bitmap, { copyResult ->
-            if (copyResult == PixelCopy.SUCCESS) {
-                // Lưu Bitmap xuống tệp tin hoặc thực hiện các xử lý khác
-                saveBitmapToFile(bitmap)
-            } else {
-                Toast.makeText(
-                    this,
-                    "Không thể xuất ảnh từ GLSurfaceView",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-            // Đóng SurfaceTexture và Surface sau khi sử dụng
-            surfaceTexture.release()
-            surface.release()
-        }, glSurfaceView.handler)
-    }
-
     private fun saveBitmapToFile(bitmap: Bitmap) {
         val storageDir = File(
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
-            "YourAppName"
+            "Cyclograph"
         )
         storageDir.mkdirs()
 
