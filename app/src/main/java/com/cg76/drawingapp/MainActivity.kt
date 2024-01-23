@@ -1,6 +1,8 @@
 package com.cg76.drawingapp
 
 import android.app.Dialog
+import android.content.ContentValues
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.PorterDuff
@@ -26,13 +28,16 @@ import com.cg76.drawingapp.databinding.ShapePopupBinding
 import com.cg76.drawingapp.databinding.StrokePopupBinding
 import android.graphics.drawable.LayerDrawable
 import android.icu.text.SimpleDateFormat
+import android.net.Uri
 import android.opengl.GLES20
 import android.os.Environment
+import android.provider.MediaStore
 import android.util.Log
 import android.view.PixelCopy
 import android.view.Surface
 import android.widget.GridLayout
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.get
 import com.cg76.drawingapp.GLESSurfaceView.Companion.bitmap
@@ -155,7 +160,13 @@ class MainActivity : AppCompatActivity() {
         )
 
         saveButton.setOnClickListener {
-            bitmap?.let { it1 -> saveBitmapToFile(it1) }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                bitmap?.let { it1 -> saveBitmapToDCIM(it1) }
+            } else {
+                // Nếu thiết bị chạy dưới Android 10
+                bitmap?.let { it1 -> saveBitmapToFile(it1) }
+            }
+
         }
 
         onButtonClicked(shapePickerButton)
@@ -805,7 +816,7 @@ class MainActivity : AppCompatActivity() {
     private fun saveBitmapToFile(bitmap: Bitmap) {
         val albumName = "CycloGraph Application"
         val storageDir = File(
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),
             albumName
         )
 
@@ -837,6 +848,40 @@ class MainActivity : AppCompatActivity() {
                 "Lỗi khi lưu ảnh",
                 Toast.LENGTH_SHORT
             ).show()
+        }
+    }
+
+
+    private fun saveBitmapToDCIM(bitmap: Bitmap) {
+        val contentValues = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, "output_image.png")
+            put(MediaStore.Images.Media.MIME_TYPE, "image/png")
+            put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis() / 1000)
+            put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
+        }
+
+        val resolver = contentResolver
+        val imageUri: Uri? =
+            resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+
+        imageUri?.let { uri ->
+            try {
+                resolver.openOutputStream(uri)?.use { outputStream ->
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+                    Toast.makeText(
+                        this,
+                        "Image saved at: ${imageUri.toString()}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            } catch (e: IOException) {
+                e.printStackTrace()
+                Toast.makeText(
+                    this,
+                    "Error saving image",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
     }
 

@@ -39,7 +39,6 @@ class GLESRenderer: GLSurfaceView.Renderer {
         xAxis.createProgram()
         yAxis.createProgram()
         shapeLists.add(mutableListOf(xAxis,yAxis))
-        shapeLists.removeFirst()
 
     }
 
