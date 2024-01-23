@@ -25,6 +25,7 @@ import com.cg76.drawingapp.databinding.GenerCycloPopupBinding
 import com.cg76.drawingapp.databinding.ShapePopupBinding
 import com.cg76.drawingapp.databinding.StrokePopupBinding
 import android.graphics.drawable.LayerDrawable
+import android.icu.text.SimpleDateFormat
 import android.opengl.GLES20
 import android.os.Environment
 import android.util.Log
@@ -39,6 +40,8 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.nio.ByteBuffer
+import java.util.Date
+import java.util.Locale
 
 
 class MainActivity : AppCompatActivity() {
@@ -806,7 +809,9 @@ class MainActivity : AppCompatActivity() {
         )
         storageDir.mkdirs()
 
-        val imageFile = File(storageDir, "output_image.png")
+        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val imageFileName = "output_image_$timeStamp.png"
+        val imageFile = File(storageDir, imageFileName)
 
         try {
             FileOutputStream(imageFile).use { out ->
