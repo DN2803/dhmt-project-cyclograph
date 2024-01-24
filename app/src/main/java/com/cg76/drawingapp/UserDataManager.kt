@@ -40,7 +40,7 @@ class UserDataManager private constructor() {
         File(filePath).writeText(json)
     }
 
-    fun readFile() {
+    private fun readFile() {
         fileList = directory.listFiles()!!
 
         for (i in fileList.indices){
@@ -56,7 +56,7 @@ class UserDataManager private constructor() {
         writeSampleToFile(data)
     }
 
-    fun removeSample(index: Int) {
+    fun removeData(index: Int) {
         userDataList.removeAt(index)
         fileList[index].delete()
     }

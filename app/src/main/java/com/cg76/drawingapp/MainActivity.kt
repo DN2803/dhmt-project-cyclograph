@@ -127,6 +127,7 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -136,15 +137,16 @@ class MainActivity : AppCompatActivity() {
         glSurfaceView = findViewById(R.id.glSurfaceView)
 
         layerList = findViewById(R.id.layerList)
+        //customShapeLayout = findViewById<LinearLayout>(R.id.theirShape)
 
-        var navigateBTN = findViewById<LinearLayout>(R.id.navigate)
-        shapePickerButton = findViewById<ImageButton>(R.id.btn_draw)
-        colorPickerButton = findViewById<ImageButton>(R.id.btn_colors)
-        strokePickerButton = findViewById<ImageButton>(R.id.btn_stroke)
-        GenerateButton = findViewById<ImageButton>(R.id.btn_cyclo)
-        affinePickerButton = findViewById<ImageButton>(R.id.btn_affine)
+        val navigateBTN = findViewById<LinearLayout>(R.id.navigate)
+        shapePickerButton = findViewById(R.id.btn_draw)
+        colorPickerButton = findViewById(R.id.btn_colors)
+        strokePickerButton = findViewById(R.id.btn_stroke)
+        GenerateButton = findViewById(R.id.btn_cyclo)
+        affinePickerButton = findViewById(R.id.btn_affine)
         //saveButton = findViewById<ImageButton>(R.id.btn_download)
-        menuButton = findViewById<ImageButton>(R.id.btn_menu)
+        menuButton = findViewById(R.id.btn_menu)
         actionButtons.addAll(
             listOf(
                 shapePickerButton,
@@ -154,6 +156,25 @@ class MainActivity : AppCompatActivity() {
                 affinePickerButton
             )
         )
+
+        val deleteButton = findViewById<ImageButton>(R.id.deleteSample)
+        deleteButton.setOnClickListener {
+            var i = 0
+            while (i < currentUserData.isSelectedList.size) {
+                if (currentUserData.isSelectedList[i])
+                    currentUserData.removeSampleAt(i)
+                else
+                    i++
+            }
+            layerList.removeAllViews()
+            layerList.invalidate()
+
+            buttonCount=0
+            for (i in 0 until currentUserData.shapeLists.size - 2){
+                addLayerButton()
+            }
+            glSurfaceView.requestRender()
+        }
 
 
         val menuPopup = Dialog(this).apply {

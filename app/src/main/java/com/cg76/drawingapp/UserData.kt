@@ -26,9 +26,11 @@ data class UserData(
     var hSheer: Float = 0f
 ) {
 
-//    fun removeSampleAt(index: Int){
-//        shapeLists.
-//    }
+    fun removeSampleAt(index: Int){
+        shapeLists.removeAt(index)
+        isSelectedList.removeAt(index)
+        sampleCount--
+    }
 
     fun selectedSampleToString(): String {
         var selectedSamples = mutableListOf(mutableListOf<Shape>())
