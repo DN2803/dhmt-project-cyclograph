@@ -58,7 +58,6 @@ class MainActivity : AppCompatActivity() {
 
         lateinit var layerList: LinearLayout
         lateinit var customShapeLayout: LinearLayout
-        var activeList = mutableListOf<Boolean>()
         var context: MainActivity? = null
         private var buttonCount = 0
 
@@ -70,7 +69,7 @@ class MainActivity : AppCompatActivity() {
                 LinearLayout.LayoutParams.MATCH_PARENT // height
             )
 
-            activeList.add(false)
+            currentUserData.isSelectedList.add(false)
 
             newButton.id = buttonCount
             buttonCount++
@@ -79,9 +78,9 @@ class MainActivity : AppCompatActivity() {
 
             newButton.setOnClickListener {
                 val id = newButton.id
-                activeList[id] = !activeList[id]
+                currentUserData.isSelectedList[id] = !currentUserData.isSelectedList[id]
 
-                if (activeList[id]) {
+                if (currentUserData.isSelectedList[id]) {
                     newButton.setBackgroundColor(0xFFA9A9A9.toInt())
                 } else {
                     newButton.setBackgroundColor(0xFFFFFFFF.toInt())
@@ -549,8 +548,8 @@ class MainActivity : AppCompatActivity() {
     }
     private fun setAffine() {
 
-        currentUserData.vShift = affinePopupBinding.transx.seekBar.progress.toInt()
-        currentUserData.hShift = affinePopupBinding.transy.seekBar.progress.toInt()
+        currentUserData.vShift = affinePopupBinding.transx.seekBar.progress.toFloat()
+        currentUserData.hShift = affinePopupBinding.transy.seekBar.progress.toFloat()
         currentUserData.scale = affinePopupBinding.scale.seekBar.progress.toFloat() * 0.1f + 0.1f
         currentUserData.rotate = affinePopupBinding.rotate.seekBar.progress.toFloat()
         currentUserData.vSheer = affinePopupBinding.sheerx.seekBar.progress.toFloat()
@@ -836,8 +835,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun deselectAllLayer(){
-        for (i in 0..<activeList.size){
-            activeList[i] = false
+        for (i in 0..<currentUserData.isSelectedList.size){
+            currentUserData.isSelectedList[i] = false
             layerList[i].setBackgroundColor(0xFFFFFFFF.toInt())
         }
     }

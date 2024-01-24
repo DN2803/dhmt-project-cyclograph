@@ -21,14 +21,15 @@ enum class ActionType{
 
 abstract class Shape(
     protected var _vertexCount: Int,
-    protected var _vertices: MutableList<Vertex> = mutableListOf<Vertex>(),
+    protected var _vertices: MutableList<Vertex> = mutableListOf(),
     protected var _color: FloatArray = FloatArray(16),
     protected var _size: Float,
 ) : Drawable {
     protected abstract var _drawMode: Int
+    protected abstract var _type: ShapeType
     private var _isTemp = false
     private var _isClone = false
-    protected abstract var _type: ShapeType
+    protected var _centerPoint = Vertex()
 
 
     var vertexCount: Int
@@ -61,8 +62,12 @@ abstract class Shape(
 
     var type: ShapeType
         get() = _type
-        set(isClone) {_type = type}
+        set(type) {_type = type}
 
+    var centerPoint: Vertex
+        get() = _centerPoint
+        set(centerPoint) {_centerPoint = centerPoint}
+    
     companion object{
         private const val vertexShaderCode =
             "uniform mat4 uMVPMatrix;" +

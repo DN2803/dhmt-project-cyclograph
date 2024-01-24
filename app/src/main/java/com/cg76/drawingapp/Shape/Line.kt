@@ -21,7 +21,6 @@ class LineBuilder: ShapeBuilder{
         // x' = width -> x = K
         // -> x = ((x')/height)*2 - width/height
 
-
         val x1 = (startPoint[0] / viewHeight) * 2 - maxXCoord
         val y1 = 1 - 2 * (startPoint[1] / viewHeight)
 
@@ -29,7 +28,9 @@ class LineBuilder: ShapeBuilder{
         val y2 = 1 - 2 * (endPoint[1] / viewHeight)
 
         val vertices = mutableListOf(Vertex(x1,y1), Vertex(x2, y2))
-        return Line(2, vertices, color, size)
+        var res = Line(2, vertices, color, size)
+        res.centerPoint = Vertex((x1+x2)/2, (y1+y2)/2)
+        return res
     }
 
     override fun build(

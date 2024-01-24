@@ -1,23 +1,19 @@
 package com.cg76.drawingapp
 
+import android.annotation.SuppressLint
 import android.icu.text.SimpleDateFormat
-import android.os.Environment
 import com.google.gson.Gson
 import java.io.File
-import java.io.FileNotFoundException
-import java.io.FilenameFilter
-import java.nio.file.Paths
 import java.util.Date
 
 class UserDataManager private constructor() {
     private var userDataList: MutableList<UserData> = mutableListOf()
-
+    private lateinit var fileList: Array<File>
     private object Holder { val INSTANCE = UserDataManager() }
 
     companion object {
         private const val directoryPath = "CycloGraph App"
         private val directory = File(directoryPath)
-        private const val counterPath = "read_this_first.txt"
         private const val defaultFileName = "data_"
         private var fileCount = 0
         private const val extension = ".json"
@@ -35,18 +31,7 @@ class UserDataManager private constructor() {
     }
 
 
-    fun writeSampleToFile(sampleIndex: Int) {
-        val json = userDataList[sampleIndex].selectedSampleToString()
-
-        val timestamp = SimpleDateFormat("yyyyMMddHHmmssSSS").format(Date())
-        val filePath = "$directoryPath/$defaultFileName$timestamp$extension"
-        File(filePath).writeText(json)
-    }
-
-    fun register(data: UserData){
-
-    }
-
+    @SuppressLint("SimpleDateFormat")
     fun writeSampleToFile(userData: UserData){
         val json = userData.selectedSampleToString()
 
@@ -56,21 +41,27 @@ class UserDataManager private constructor() {
     }
 
     fun readFile() {
-        val fileList = directory.listFiles()
+        fileList = directory.listFiles()!!
 
-        if (fileList != null) {
-            for (i in fileList.indices){
-                val json = fileList[i].readText()
-                var userData = UserData()
-                userData.loadSamples(json)
-                userDataList.add(userData)
-            }
+        for (i in fileList.indices){
+            val json = fileList[i].readText()
+            var userData = UserData()
+            userData.loadSamples(json)
+            userDataList.add(userData)
         }
-
     }
 
+    fun addSample(data: UserData){
+        userDataList.add(data)
+        writeSampleToFile(data)
+    }
+
+    fun removeSample(index: Int) {
+        userDataList.removeAt(index)
+        fileList[index].delete()
+    }
 
     fun select(index: Int): UserData? {
-        return userDataList?.get(index) ?: null
+        return userDataList[index]
     }
 }

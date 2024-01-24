@@ -1,10 +1,8 @@
 package com.cg76.drawingapp
 import android.content.Context
-import android.graphics.Bitmap
 import android.opengl.GLSurfaceView
 import android.util.AttributeSet
 import android.view.MotionEvent
-import com.cg76.drawingapp.MainActivity.Companion.activeList
 import com.cg76.drawingapp.MainActivity.Companion.addLayerButton
 import com.cg76.drawingapp.MainActivity.Companion.currentUserData
 import com.cg76.drawingapp.Shape.*
@@ -24,7 +22,6 @@ class GLESSurfaceView @JvmOverloads constructor(
     init {
         // Create an OpenGL ES 2.0 context
         setEGLContextClientVersion(2)
-        //setEGLConfigChooser(8,8,8,8,16,0)
 
         renderer = GLESRenderer()
 
@@ -103,37 +100,6 @@ class GLESSurfaceView @JvmOverloads constructor(
         }
     }
 
-    private var previousX: Float = 0f
-    private var previousY: Float = 0f
-
-//    private fun affineTrans(e: MotionEvent, type: ActionType, shapeID: Int){
-//        //val transMatrixBuilder = TransMatrixBuilder()
-//        lateinit var transMatrix: FloatArray
-//
-//        when (e.action) {
-//            MotionEvent.ACTION_MOVE -> {
-//                var dx: Float = x - previousX
-//                var dy: Float = y - previousY
-//                // reverse direction of rotation above the mid-line
-//                if (y > height / 2) {
-//                    dx *= -1
-//                }
-//                // reverse direction of rotation to left of the mid-line
-//                if (x < width / 2) {
-//                    dy *= -1
-//                }
-//                //transMatrix = transMatrixBuilder.build(ROTATE, dx, dy)
-//
-//                //queueEvent() { renderer.updateShapeAt(transMatrix, shapeID)}
-//
-//                requestRender()
-//            }
-//        }
-//
-//        previousX = x
-//        previousY = y
-//    }
-
     fun requestRender(actionType: ActionType){
         when(actionType){
             COLOR -> colorShape()
@@ -148,9 +114,8 @@ class GLESSurfaceView @JvmOverloads constructor(
     }
 
     private fun genCycloGraph() {
-
-        for (i in 0..<activeList.size){
-            if (activeList[i])
+        for (i in 0..<currentUserData.isSelectedList.size){
+            if (currentUserData.isSelectedList[i])
                 queueEvent {
                     renderer.generateCyclograph(i)
                 }

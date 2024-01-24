@@ -1,15 +1,10 @@
 package com.cg76.drawingapp
 
 import android.graphics.Bitmap
-import com.cg76.drawingapp.Shape.Line
 import com.cg76.drawingapp.Shape.Shape
 import com.cg76.drawingapp.Shape.ShapeType
-import com.cg76.drawingapp.Shape.Vertex
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import kotlin.math.PI
-import kotlin.math.cos
-import kotlin.math.sin
 
 data class UserData(
     var shapeLists: MutableList<MutableList<Shape>> = mutableListOf(mutableListOf()),
@@ -23,28 +18,17 @@ data class UserData(
     var copies: Int = 0,
     var bitmap: Bitmap? = null,
     // data for transformation,
-    var vShift: Int = 0,
-    var hShift: Int = 0,
+    var vShift: Float = 0f,
+    var hShift: Float = 0f,
     var scale: Float = 1f,
     var rotate: Float = 0f,
     var vSheer: Float = 0f,
     var hSheer: Float = 0f
 ) {
 
-    init {
-
-    }
-
-    fun toJson(): String {
-        val gson = Gson()
-        return gson.toJson(this)
-    }
-
-    fun fromJson(json: String): UserData {
-        val gson = Gson()
-        val userData = gson.fromJson(json, UserData::class.java)
-        return userData ?: UserData()
-    }
+//    fun removeSampleAt(index: Int){
+//        shapeLists.
+//    }
 
     fun selectedSampleToString(): String {
         var selectedSamples = mutableListOf(mutableListOf<Shape>())
@@ -65,6 +49,12 @@ data class UserData(
         for (i in 0 until shapeLists.size){
             isSelectedList.add(false)
         }
+    }
+
+    fun loadSamples(data: UserData){
+        shapeLists = data.shapeLists
+        sampleCount = data.sampleCount
+        isSelectedList = data.isSelectedList
     }
 
     override fun equals(other: Any?): Boolean {
@@ -102,8 +92,8 @@ data class UserData(
         result = 31 * result + color.contentHashCode()
         result = 31 * result + copies
         result = 31 * result + (bitmap?.hashCode() ?: 0)
-        result = 31 * result + vShift
-        result = 31 * result + hShift
+        result = 31 * result + vShift.hashCode()
+        result = 31 * result + hShift.hashCode()
         result = 31 * result + scale.hashCode()
         result = 31 * result + rotate.hashCode()
         result = 31 * result + vSheer.hashCode()
