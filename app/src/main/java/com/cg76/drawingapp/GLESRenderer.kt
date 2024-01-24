@@ -5,7 +5,7 @@ import android.opengl.GLES20
 import android.opengl.GLException
 import android.opengl.GLSurfaceView
 import android.opengl.Matrix
-import com.cg76.drawingapp.GLESSurfaceView.Companion.bitmap
+import com.cg76.drawingapp.MainActivity.Companion.currentUserData
 import com.cg76.drawingapp.Shape.*
 import java.nio.IntBuffer
 import javax.microedition.khronos.egl.EGLConfig
@@ -17,17 +17,6 @@ import kotlin.math.sin
 
 class GLESRenderer: GLSurfaceView.Renderer {
 
-    private var shapeLists = mutableListOf(mutableListOf<Shape>())
-    private var xAxis = Line(
-        2,
-        mutableListOf(Vertex(-1f,0f), Vertex(1f,0f)),
-        floatArrayOf(0f,0f,0f,0.4f),
-        3f)
-    private var yAxis = Line(
-        2,
-        mutableListOf(Vertex(0f,-1f), Vertex(0f,1f)),
-        floatArrayOf(0f,0f,0f,0.4f),
-        3f)
 
     override fun onSurfaceCreated(unused: GL10, config: EGLConfig) {
         // Set the background frame color
@@ -36,9 +25,20 @@ class GLESRenderer: GLSurfaceView.Renderer {
         GLES20.glEnable(GLES20.GL_BLEND)
         GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA,GLES20.GL_ONE_MINUS_SRC_ALPHA)
 
+        var xAxis = Line(
+            2,
+            mutableListOf(Vertex(-1f,0f), Vertex(1f,0f)),
+            floatArrayOf(0f,0f,0f,0.4f),
+            3f)
+        var yAxis = Line(
+            2,
+            mutableListOf(Vertex(0f,-1f), Vertex(0f,1f)),
+            floatArrayOf(0f,0f,0f,0.4f),
+            3f)
+
         xAxis.createProgram()
         yAxis.createProgram()
-        shapeLists.add(mutableListOf(xAxis,yAxis))
+        currentUserData.shapeLists.add(mutableListOf(xAxis,yAxis))
 
     }
 
@@ -49,7 +49,7 @@ class GLESRenderer: GLSurfaceView.Renderer {
 
     private val rotationMatrix = FloatArray(16)
 
-    var angle: Float = 0f
+    private var angle: Float = 0f
     override fun onDrawFrame(unused: GL10) {
         val scratch = FloatArray(16)
 
@@ -69,23 +69,22 @@ class GLESRenderer: GLSurfaceView.Renderer {
         // for the matrix multiplication product to be correct.
         Matrix.multiplyMM(scratch, 0, vPMatrix, 0, rotationMatrix, 0)
 
-        for (i in 0 until shapeLists.size - 1){
-            for (shape in shapeLists[i]){
+        for (i in 0 until currentUserData.shapeLists.size - 1){
+            for (shape in currentUserData.shapeLists[i]){
                 shape.draw(scratch, shape.drawMode)
             }
         }
 
-        bitmap = createBitmapFromGLSurface()
+        currentUserData.bitmap = createBitmapFromGLSurface()
 
-        for (shape in shapeLists.last()){
+        for (shape in currentUserData.shapeLists.last()){
             shape.draw(scratch, shape.drawMode)
         }
 
 
-
     }
 
-    companion object{
+    companion object {
         var maxXCoord: Float = 0f
         var viewWidth: Int = 0
         var viewHeight: Int = 0
@@ -106,9 +105,9 @@ class GLESRenderer: GLSurfaceView.Renderer {
 
     private fun cleanShapesAt(index: Int) {
         var i = 0
-        while (i < shapeLists[index].size) {
-            if (shapeLists[index][i].isTemp){
-                shapeLists[index].removeAt(i)
+        while (i < currentUserData.shapeLists[index].size) {
+            if (currentUserData.shapeLists[index][i].isTemp){
+                currentUserData.shapeLists[index].removeAt(i)
             }
             else {
                 i++
@@ -117,7 +116,7 @@ class GLESRenderer: GLSurfaceView.Renderer {
     }
 
     fun initShapeListAt(index: Int){
-        shapeLists.add(index, mutableListOf())
+        currentUserData.shapeLists.add(index, mutableListOf())
     }
 
     fun addShapeAt(index: Int, shape: Shape?, isTemp: Boolean=false){
@@ -126,27 +125,27 @@ class GLESRenderer: GLSurfaceView.Renderer {
         if (shape != null){
             shape.createProgram()
             shape.isTemp = isTemp
-            shapeLists[index].add(shape)
+            currentUserData.shapeLists[index].add(shape)
         }
     }
 
     private fun clearCloneShapesAt(index: Int) {
-        while (1 < shapeLists[index].size){
-            shapeLists[index].removeAt(1)
+        while (1 < currentUserData.shapeLists[index].size){
+            currentUserData.shapeLists[index].removeAt(1)
         }
     }
 
-    fun generateCyclograph(index: Int, copies: Int){
+    fun generateCyclograph(index: Int){
         clearCloneShapesAt(index)
-        val delta = 2*PI.toFloat()/copies
+        val delta = 2*PI.toFloat()/currentUserData.copies
         var angle = delta
 
         var cosTheta = cos(angle)
         var sinTheta = sin(angle)
 
-        val sample = shapeLists[index][0]
+        val sample = currentUserData.shapeLists[index][0]
 
-        for (i in 1..<copies){
+        for (i in 1 until currentUserData.copies){
 
             var newVertices = mutableListOf<Vertex>()
 
@@ -156,8 +155,8 @@ class GLESRenderer: GLSurfaceView.Renderer {
                 newVertices.add(Vertex(newX,newY))
             }
 
-            var builder = GLESSurfaceView.factory.select(sample.type)
-            var newShape = builder?.build(
+            val builder = GLESSurfaceView.factory.select(sample.type)
+            val newShape = builder?.build(
                 sample.vertexCount,
                 newVertices,
                 sample.color,

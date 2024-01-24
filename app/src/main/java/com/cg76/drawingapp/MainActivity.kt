@@ -1,5 +1,6 @@
 package com.cg76.drawingapp
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.ContentValues
 import android.content.pm.PackageManager
@@ -40,7 +41,6 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.get
-import com.cg76.drawingapp.GLESSurfaceView.Companion.bitmap
 import com.cg76.drawingapp.databinding.MenuPopupBinding
 import java.io.File
 import java.io.FileOutputStream
@@ -53,19 +53,8 @@ import java.util.Locale
 class MainActivity : AppCompatActivity() {
 
     companion object {
-        var isDrawAction = false
-        var shapeType = ShapeType.LINE
-        var stroke: Float = 7f
-        var color = floatArrayOf(0f, 0f, 0f, 1f)
-        var copies: Int = 0
+        var currentUserData = UserData()
         lateinit var glSurfaceView: GLESSurfaceView
-
-        var V_shift = 0
-        var H_shift = 0
-        var scale = 1f
-        var rotate = 0f
-        var V_sheer = 0f
-        var H_sheer = 0f
 
         lateinit var layerList: LinearLayout
         lateinit var customShapeLayout: LinearLayout
@@ -189,10 +178,10 @@ class MainActivity : AppCompatActivity() {
         }
         menuPopupBinding.download.setOnClickListener{
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                bitmap?.let { it1 -> saveBitmapToDCIM(it1) }
+                currentUserData.bitmap?.let { it1 -> saveBitmapToDCIM(it1) }
             } else {
                 // Nếu thiết bị chạy dưới Android 10
-                bitmap?.let { it1 -> saveBitmapToFile(it1) }
+                currentUserData.bitmap?.let { it1 -> saveBitmapToFile(it1) }
             }
             menuPopup.dismiss()
         }
@@ -204,7 +193,7 @@ class MainActivity : AppCompatActivity() {
 
 
         onButtonClicked(shapePickerButton)
-        isDrawAction = true
+        currentUserData.isDrawAction = true
 
         // pick shape type
         val shapePopup = Dialog(this).apply {
@@ -470,7 +459,7 @@ class MainActivity : AppCompatActivity() {
                     clearSelection(colorGrid)
                     applySelectionEffect(colorButton)
                     val selectedColor = Color.parseColor(basicColors[i])
-                    color = colorToRGBA(selectedColor)
+                    currentUserData.color = colorToRGBA(selectedColor)
                     // TODO: Xử lý giá trị RGBA theo nhu cầu (ví dụ: hiển thị, sử dụng trong ứng dụng, ...)
                 }
                 colorGrid.addView(colorButton)
@@ -490,33 +479,33 @@ class MainActivity : AppCompatActivity() {
             deselectAllLayer()
         }
         shapePopupBinding.drawCricle.setOnClickListener{
-            shapeType = ShapeType.CIRCLE
-            isDrawAction = true
+            currentUserData.shapeType = ShapeType.CIRCLE
+            currentUserData.isDrawAction = true
             shapePopup.dismiss()
         }
         shapePopupBinding.drawBrush.setOnClickListener{
-            shapeType = ShapeType.BRUSH
-            isDrawAction = true
+            currentUserData.shapeType = ShapeType.BRUSH
+            currentUserData.isDrawAction = true
             shapePopup.dismiss()
         }
         shapePopupBinding.drawLine.setOnClickListener{
-            shapeType = ShapeType.LINE
-            isDrawAction = true
+            currentUserData.shapeType = ShapeType.LINE
+            currentUserData.isDrawAction = true
             shapePopup.dismiss()
         }
         shapePopupBinding.drawCurve.setOnClickListener{
-            shapeType = ShapeType.CURVE
-            isDrawAction = true
+            currentUserData.shapeType = ShapeType.CURVE
+            currentUserData.isDrawAction = true
             shapePopup.dismiss()
         }
         shapePopupBinding.drawPolygon.setOnClickListener{
-            shapeType = ShapeType.TRIANGLE
-            isDrawAction = true
+            currentUserData.shapeType = ShapeType.TRIANGLE
+            currentUserData.isDrawAction = true
             shapePopup.dismiss()
         }
         shapePopupBinding.drawElipse.setOnClickListener{
-            shapeType = ShapeType.ELIPSE
-            isDrawAction = true
+            currentUserData.shapeType = ShapeType.ELIPSE
+            currentUserData.isDrawAction = true
             shapePopup.dismiss()
         }
         strokePickerButton.setOnClickListener {
@@ -533,7 +522,7 @@ class MainActivity : AppCompatActivity() {
         }
         generCycloPopupBinding.apply.setOnClickListener {
 
-            copies = setCopies()
+            currentUserData.copies = setCopies()
             // call redraw
             glSurfaceView.requestRender(ActionType.GENCYCLO)
 
@@ -560,12 +549,12 @@ class MainActivity : AppCompatActivity() {
     }
     private fun setAffine() {
 
-        V_shift = affinePopupBinding.transx.seekBar.progress.toInt()
-        H_shift = affinePopupBinding.transy.seekBar.progress.toInt()
-        scale = affinePopupBinding.scale.seekBar.progress.toFloat() * 0.1f + 0.1f
-        rotate = affinePopupBinding.rotate.seekBar.progress.toFloat()
-        V_sheer = affinePopupBinding.sheerx.seekBar.progress.toFloat()
-        H_sheer = affinePopupBinding.sheery.seekBar.progress.toFloat()
+        currentUserData.vShift = affinePopupBinding.transx.seekBar.progress.toInt()
+        currentUserData.hShift = affinePopupBinding.transy.seekBar.progress.toInt()
+        currentUserData.scale = affinePopupBinding.scale.seekBar.progress.toFloat() * 0.1f + 0.1f
+        currentUserData.rotate = affinePopupBinding.rotate.seekBar.progress.toFloat()
+        currentUserData.vSheer = affinePopupBinding.sheerx.seekBar.progress.toFloat()
+        currentUserData.hSheer = affinePopupBinding.sheery.seekBar.progress.toFloat()
 
 
 //        return affines
@@ -593,11 +582,12 @@ class MainActivity : AppCompatActivity() {
 
         typeTxt.text = type
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            @SuppressLint("SetTextI18n")
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (seekBar != null) {
                     colorTxt.text = seekBar.progress.toString()
 
-                    var seekbar_color = Color.rgb(red, green, blue)
+                    val seekbar_color = Color.rgb(red, green, blue)
                     if (type == "R") {
                         red = progress
 
@@ -620,8 +610,8 @@ class MainActivity : AppCompatActivity() {
                         updateBackgroundColor(colorPopupBinding.greenLayout.seekBar, progress, 2)
                     }
                     if (type == "Opacity") {
-                        var opacity = seekBar.progress*100 /255
-                        colorTxt.text = opacity.toString() + " %"
+                        val opacity = seekBar.progress*100 /255
+                        colorTxt.text = "$opacity %"
                     }
 
                     // Set thumb color
@@ -698,7 +688,7 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun setRGBColor() {
-        color = floatArrayOf(
+        currentUserData.color = floatArrayOf(
             colorPopupBinding.redLayout.seekBar.progress.toFloat() / 255,
             colorPopupBinding.greenLayout.seekBar.progress.toFloat() / 255,
             colorPopupBinding.blueLayout.seekBar.progress.toFloat() / 255,
@@ -738,7 +728,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setStroke() {
-        stroke = strokePopupBinding.seekBar.progress.toFloat() / 100
+        currentUserData.stroke = strokePopupBinding.seekBar.progress.toFloat() / 100
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -855,7 +845,7 @@ class MainActivity : AppCompatActivity() {
     private fun saveBitmapToFile(bitmap: Bitmap) {
         val albumName = "CycloGraph Application"
         val storageDir = File(
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
             albumName
         )
 
@@ -868,7 +858,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-        val imageFileName = "output_image_$timeStamp.png"
+        val imageFileName = "cyclograph_$timeStamp.png"
         val imageFile = File(storageDir, imageFileName)
 
         try {
@@ -892,8 +882,10 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun saveBitmapToDCIM(bitmap: Bitmap) {
+        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val imageFileName = "cyclograph_$timeStamp.png"
         val contentValues = ContentValues().apply {
-            put(MediaStore.Images.Media.DISPLAY_NAME, "output_image.png")
+            put(MediaStore.Images.Media.DISPLAY_NAME, imageFileName)
             put(MediaStore.Images.Media.MIME_TYPE, "image/png")
             put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis() / 1000)
             put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())

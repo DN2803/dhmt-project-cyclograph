@@ -1,27 +1,15 @@
 package com.cg76.drawingapp
 import android.content.Context
 import android.graphics.Bitmap
-import android.opengl.GLES20
-
 import android.opengl.GLSurfaceView
-import android.os.Environment
 import android.util.AttributeSet
-import android.util.Log
 import android.view.MotionEvent
-import android.widget.Toast
 import com.cg76.drawingapp.MainActivity.Companion.activeList
 import com.cg76.drawingapp.MainActivity.Companion.addLayerButton
-import com.cg76.drawingapp.MainActivity.Companion.color
-import com.cg76.drawingapp.MainActivity.Companion.copies
-import com.cg76.drawingapp.MainActivity.Companion.isDrawAction
-import com.cg76.drawingapp.MainActivity.Companion.shapeType
-import com.cg76.drawingapp.MainActivity.Companion.stroke
+import com.cg76.drawingapp.MainActivity.Companion.currentUserData
 import com.cg76.drawingapp.Shape.*
 import com.cg76.drawingapp.Shape.ActionType.*
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import java.nio.ByteBuffer
+
 
 class GLESSurfaceView @JvmOverloads constructor(
     context: Context,
@@ -31,8 +19,6 @@ class GLESSurfaceView @JvmOverloads constructor(
     companion object{
         lateinit var renderer: GLESRenderer
         val factory = BuilderFactory()
-        var beforeGenShapeCount = 0
-        var bitmap: Bitmap? = null
     }
 
     init {
@@ -61,8 +47,8 @@ class GLESSurfaceView @JvmOverloads constructor(
     // factory here
     override fun onTouchEvent(e: MotionEvent): Boolean {
 
-        if (isDrawAction) {
-            drawShape(e, shapeType)
+        if (currentUserData.isDrawAction) {
+            drawShape(e, currentUserData.shapeType)
         }
 
         when (e.action and MotionEvent.ACTION_MASK) {
@@ -83,7 +69,7 @@ class GLESSurfaceView @JvmOverloads constructor(
         val pointerCount = e.pointerCount
         when (e.action and MotionEvent.ACTION_MASK) {
             MotionEvent.ACTION_DOWN -> {
-                queueEvent { renderer.initShapeListAt(beforeGenShapeCount)}
+                queueEvent { renderer.initShapeListAt(currentUserData.sampleCount)}
                 startPoint = floatArrayOf(e.x, e.y)
                 performClick()
             }
@@ -91,11 +77,11 @@ class GLESSurfaceView @JvmOverloads constructor(
                 if (pointerCount == 1) {
                     endPoint = floatArrayOf(e.x, e.y)
 
-                    var builder = factory.select(type)
-                    var shape = builder?.build(startPoint,endPoint, color, stroke)
+                    val builder = factory.select(type)
+                    val shape = builder?.build(startPoint,endPoint, currentUserData.color, currentUserData.stroke)
 
                     queueEvent {
-                        renderer.addShapeAt(beforeGenShapeCount, shape, true)
+                        renderer.addShapeAt(currentUserData.sampleCount, shape, true)
                     }
                     requestRender()
                 }
@@ -104,14 +90,14 @@ class GLESSurfaceView @JvmOverloads constructor(
             MotionEvent.ACTION_UP -> {
                 endPoint = floatArrayOf(e.x, e.y)
 
-                if (endPoint != startPoint) {
-                    var builder = factory.select(type)
-                    var shape = builder?.build(startPoint,endPoint, color, stroke)
+                if (!endPoint.contentEquals(startPoint)) {
+                    val builder = factory.select(type)
+                    val shape = builder?.build(startPoint,endPoint, currentUserData.color, currentUserData.stroke)
 
-                    queueEvent { renderer.addShapeAt(beforeGenShapeCount, shape) }
+                    queueEvent { renderer.addShapeAt(currentUserData.sampleCount, shape) }
                     requestRender()
                     addLayerButton()
-                    beforeGenShapeCount++
+                    currentUserData.sampleCount++
                 }
             }
         }
@@ -166,7 +152,7 @@ class GLESSurfaceView @JvmOverloads constructor(
         for (i in 0..<activeList.size){
             if (activeList[i])
                 queueEvent {
-                    renderer.generateCyclograph(i, copies)
+                    renderer.generateCyclograph(i)
                 }
         }
 
