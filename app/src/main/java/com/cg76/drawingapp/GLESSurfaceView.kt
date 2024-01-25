@@ -125,17 +125,25 @@ class GLESSurfaceView @JvmOverloads constructor(
     }
 
     private fun colorShape(){
-        queueEvent{
-            renderer.colorShape()
+        for (i in 0..<currentUserData.isSelectedList.size) {
+            if (currentUserData.isSelectedList[i]) {
+                queueEvent {
+                    renderer.colorShape(i)
+                }
+                requestRender()
+            }
         }
-        requestRender()
     }
 
     private fun scaleShape(){
-        queueEvent{
-            renderer.scaleShape()
+        for (i in 0..<currentUserData.isSelectedList.size) {
+            if (currentUserData.isSelectedList[i]) {
+                queueEvent {
+                    renderer.scaleShape(i)
+                }
+                requestRender()
+            }
         }
-        requestRender()
     }
 
     private fun rotateShape(){
@@ -146,10 +154,15 @@ class GLESSurfaceView @JvmOverloads constructor(
     }
 
     private fun translateShape(){
-        queueEvent{
-            renderer.translateShape()
-        }
-        requestRender()
+        if(currentUserData.hShift == 0f && currentUserData.vShift == 0f) return
+        for (i in 0..<currentUserData.isSelectedList.size)
+            if (currentUserData.isSelectedList[i]) {
+                queueEvent {
+                    renderer.translateShape(i)
+                }
+                requestRender()
+            }
+
     }
 
     private fun mirrorShape(){

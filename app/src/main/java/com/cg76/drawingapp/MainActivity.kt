@@ -41,6 +41,8 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.get
+import com.cg76.drawingapp.GLESRenderer.Companion.maxXCoord
+import com.cg76.drawingapp.GLESRenderer.Companion.viewHeight
 import com.cg76.drawingapp.databinding.MenuPopupBinding
 import java.io.File
 import java.io.FileOutputStream
@@ -533,8 +535,8 @@ class MainActivity : AppCompatActivity() {
             onButtonClicked(strokePickerButton)
         }
         strokePopupBinding.root.setOnClickListener {
-            strokePopup.dismiss()
             setStroke()
+            strokePopup.dismiss()
         }
         GenerateButton.setOnClickListener {
             generPopup.show()
@@ -569,9 +571,8 @@ class MainActivity : AppCompatActivity() {
     }
     private fun setAffine() {
 
-        currentUserData.vShift = affinePopupBinding.transx.seekBar.progress.toFloat()
-        currentUserData.hShift = affinePopupBinding.transy.seekBar.progress.toFloat()
-        currentUserData.scale = affinePopupBinding.scale.seekBar.progress.toFloat() * 0.1f + 0.1f
+        currentUserData.vShift = (affinePopupBinding.transx.seekBar.progress.toFloat() / viewHeight)
+        currentUserData.hShift =  (affinePopupBinding.transy.seekBar.progress.toFloat() / viewHeight)
         currentUserData.rotate = affinePopupBinding.rotate.seekBar.progress.toFloat()
         currentUserData.vSheer = affinePopupBinding.sheerx.seekBar.progress.toFloat()
         currentUserData.hSheer = affinePopupBinding.sheery.seekBar.progress.toFloat()
@@ -764,7 +765,9 @@ class MainActivity : AppCompatActivity() {
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 valueTxt.text = seekBar?.progress.toString()
+
                 glSurfaceView.requestRender(actionType)
+                setAffine()
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
@@ -802,6 +805,7 @@ class MainActivity : AppCompatActivity() {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (seekBar != null) {
                     val scale = minScale + progress * 0.1
+                    currentUserData.scale = scale.toFloat()
                     valueTxt.text = String.format("%.2f", scale)
                 }
 
