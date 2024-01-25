@@ -134,7 +134,10 @@ class CircleBuilder: ShapeBuilder{
         val y1 = (y2+ (if (y3>y2) 1 else -1)*rx)
 
         var vertices = setPossition(x1, y1, rx, rx)
-        return Circle(vertices.size, vertices, color, size)
+        var res = Circle(vertices.size, vertices, color, size)
+        res.centerPoint = Vertex(x1, y1)
+        return res
+
     }
 
     override fun build(
@@ -173,7 +176,9 @@ class ElipseBuilder: ShapeBuilder{
         val y1 = (y2+ (if (y3>y2) 1 else -1)*ry)
 
         var vertices = setPossition(x1, y1, rx, ry)
-        return Circle(vertices.size, vertices, color, size)
+        var res = Circle(vertices.size, vertices, color, size)
+        res.centerPoint = Vertex(x1, y1)
+        return res
 
 
     }

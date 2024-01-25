@@ -571,8 +571,8 @@ class MainActivity : AppCompatActivity() {
     }
     private fun setAffine() {
 
-        currentUserData.vShift = (affinePopupBinding.transx.seekBar.progress.toFloat() / viewHeight)
-        currentUserData.hShift =  (affinePopupBinding.transy.seekBar.progress.toFloat() / viewHeight)
+        currentUserData.vShift = affinePopupBinding.transx.seekBar.progress.toFloat()/(2*viewHeight)
+        currentUserData.hShift = affinePopupBinding.transy.seekBar.progress.toFloat()/(2*viewHeight)
         currentUserData.rotate = affinePopupBinding.rotate.seekBar.progress.toFloat()
         currentUserData.vSheer = affinePopupBinding.sheerx.seekBar.progress.toFloat()
         currentUserData.hSheer = affinePopupBinding.sheery.seekBar.progress.toFloat()
@@ -751,7 +751,18 @@ class MainActivity : AppCompatActivity() {
     private fun setStroke() {
         currentUserData.stroke = strokePopupBinding.seekBar.progress.toFloat() / 100
     }
-
+    fun applyAffine() {
+        for (i in 0..<currentUserData.isSelectedList.size)
+            if (currentUserData.isSelectedList[i]) {
+                currentUserData.shapeLists[i].removeFirst()
+            }
+        currentUserData.vShift = 0f
+        currentUserData.hShift = 0f
+        currentUserData.scale = 1f
+        currentUserData.rotate = 0f
+        currentUserData.vSheer = 0f
+        currentUserData.hSheer = 0f
+    }
     @RequiresApi(Build.VERSION_CODES.O)
     private fun setOnSeekbarAffine(
         type: String, typeTxt: TextView, seekBar: SeekBar, valueTxt: TextView,

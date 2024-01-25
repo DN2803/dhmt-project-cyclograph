@@ -201,31 +201,57 @@ class GLESRenderer: GLSurfaceView.Renderer {
 
     }
 
-    fun scaleShape(index: Int){
+    fun scaleShape(index: Int) {
         val sample = currentUserData.shapeLists[index][0]
         var center = sample.centerPoint
-        center.x = (center.x + maxXCoord) /2 * viewHeight
-        center.y = (1 - center.y)/2 * viewHeight
+//        center.x = (center.x + maxXCoord) /2 * viewHeight
+//        center.y = (1 - center.y)/2 * viewHeight
         //convert vertices to WSD
-        val vertices = convertToWSD(sample.vertices)
+        //val vertices = convertToWSD(sample.vertices)
+//        var newVertices = mutableListOf<Vertex>()
+//        for (i in 0..<sample.vertices.size) {
+//            var x  = (sample.vertices[i].x - center.x)* currentUserData.scale + center.x
+//            var y  = (sample.vertices[i].y - center.y)* currentUserData.scale + center.y
+//            newVertices.add(Vertex(x, y))
+//        }
+//        //newVertices = convertToVSD(newVertices)
+//        val builder = GLESSurfaceView.factory.select(sample.type)
+//        val newShape = builder?.build(
+//            sample.vertexCount,
+//            newVertices,
+//            sample.color,
+//            sample.size)
+//        while (0 < currentUserData.shapeLists[index].size){
+//            currentUserData.shapeLists[index].removeAt(0)
+//        }
+//        if (newShape != null) {
+//            this.addShapeAt(index, newShape)
+//        }
+//    }
+
         var newVertices = mutableListOf<Vertex>()
-        for (i in 0..<vertices.size) {
-            var x  = (vertices[i].x - center.x)* currentUserData.scale + center.x
-            var y  = (vertices[i].y - center.y)* currentUserData.scale + center.y
-            newVertices.add(Vertex(x, y))
+        if (sample.drawMode == GLES20.GL_LINES )
+            for (i in 0..<sample.vertices.size) {
+                val x  = (sample.vertices[i].x - center.x)* currentUserData.scale + center.x
+                val y  = (sample.vertices[i].y - center.y)* currentUserData.scale + center.y
+                newVertices.add(Vertex(x, y))
+            }
+        else {
+
         }
-        newVertices = convertToVSD(newVertices)
         val builder = GLESSurfaceView.factory.select(sample.type)
         val newShape = builder?.build(
             sample.vertexCount,
             newVertices,
             sample.color,
-            sample.size)
-        while (0 < currentUserData.shapeLists[index].size){
-            currentUserData.shapeLists[index].removeAt(0)
+            sample.size
+        )
+        while (currentUserData.shapeLists[index].size > 1) {
+            currentUserData.shapeLists[index].removeAt(1)
         }
         if (newShape != null) {
-            this.addShapeAt(index, newShape)
+            newShape.createProgram()
+            currentUserData.shapeLists[index].add(newShape)
         }
     }
 
@@ -275,11 +301,15 @@ class GLESRenderer: GLSurfaceView.Renderer {
             newVertices,
             sample.color,
             sample.size)
-        currentUserData.shapeLists.removeAt(index)
-        initShapeListAt(index)
-        if (newShape != null) {
-            this.addShapeAt(index, newShape)
+        while (currentUserData.shapeLists[index].size > 1) {
+            currentUserData.shapeLists[index].removeAt(1)
         }
+        if (newShape != null) {
+            newShape.createProgram()
+            currentUserData.shapeLists[index].add(newShape)
+        }
+//        currentUserData.hShift = 0f
+//        currentUserData.vShift = 0f
     }
 
     fun mirrorShape(){
