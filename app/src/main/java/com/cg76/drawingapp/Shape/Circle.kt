@@ -34,19 +34,6 @@ fun setPossition (centerX: Float, centerY: Float, A: Float, B: Float): MutableLi
 
 
     var vertices = mutableListOf<Vertex>()
-//    val angleIncrement = 2 * Math.PI / 360
-//
-//    var angle = 0.0 + angleIncrement
-//
-//
-//    for (i in 0..360) {
-//        var x = (centerX + rx * cos(angle)).toFloat();
-//        var y = (centerY + ry * sin(angle)).toFloat();
-//        var z = 0f;
-//        angle += angleIncrement
-//        vertices.add(Vertex(x, y, z));
-//    }
-//    return vertices
 
     var A2: Float
     var B2: Float
@@ -136,6 +123,8 @@ class CircleBuilder: ShapeBuilder{
         var vertices = setPossition(x1, y1, rx, rx)
         var res = Circle(vertices.size, vertices, color, size)
         res.centerPoint = Vertex(x1, y1)
+        res.startPoint = Vertex(x1 - rx, y1 - rx)
+        res.endPoint = Vertex(x1 + rx, y1 + rx)
         return res
 
     }
@@ -178,6 +167,8 @@ class ElipseBuilder: ShapeBuilder{
         var vertices = setPossition(x1, y1, rx, ry)
         var res = Circle(vertices.size, vertices, color, size)
         res.centerPoint = Vertex(x1, y1)
+        res.startPoint = Vertex(x1 - rx, y1 - ry)
+        res.endPoint = Vertex(x1 + rx, y1 + ry)
         return res
 
 

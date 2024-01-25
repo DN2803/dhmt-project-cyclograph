@@ -30,7 +30,9 @@ class TriangleBuilder: ShapeBuilder{
         val y1 = 1 - 2 * (startPoint[1] / GLESRenderer.viewHeight)
 
         val vertices = mutableListOf(Vertex(x1,y1), Vertex(x2,y2), Vertex(x3,y3))
-        return Triangle(3, vertices, color, size)
+        var res = Triangle(3, vertices, color, size)
+        res.centerPoint = Vertex((x1+x2+x3)/3, (y1+y2+y3)/3)
+        return res
     }
 
     override fun build(

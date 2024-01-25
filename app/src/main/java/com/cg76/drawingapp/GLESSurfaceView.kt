@@ -147,10 +147,14 @@ class GLESSurfaceView @JvmOverloads constructor(
     }
 
     private fun rotateShape(){
-        queueEvent{
-            renderer.rotateShape()
+        for (i in 0..<currentUserData.isSelectedList.size) {
+            if (currentUserData.isSelectedList[i]) {
+                queueEvent {
+                    renderer.rotateShape(i)
+                }
+                requestRender()
+            }
         }
-        requestRender()
     }
 
     private fun translateShape(){
@@ -171,12 +175,16 @@ class GLESSurfaceView @JvmOverloads constructor(
         }
         requestRender()
     }
-    private fun shearShape(){
-        queueEvent{
-            renderer.shearShape()
-        }
-
+    private fun shearShape() {
+        if(currentUserData.hShift == 0f && currentUserData.vShift == 0f) return
+        for (i in 0..<currentUserData.isSelectedList.size)
+            if (currentUserData.isSelectedList[i]) {
+                queueEvent {
+                    renderer.shearShape(i)
+                }
+            }
         requestRender()
+
     }
 
 

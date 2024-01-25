@@ -202,41 +202,25 @@ class GLESRenderer: GLSurfaceView.Renderer {
     }
 
     fun scaleShape(index: Int) {
+
         val sample = currentUserData.shapeLists[index][0]
         var center = sample.centerPoint
-//        center.x = (center.x + maxXCoord) /2 * viewHeight
-//        center.y = (1 - center.y)/2 * viewHeight
-        //convert vertices to WSD
-        //val vertices = convertToWSD(sample.vertices)
-//        var newVertices = mutableListOf<Vertex>()
-//        for (i in 0..<sample.vertices.size) {
-//            var x  = (sample.vertices[i].x - center.x)* currentUserData.scale + center.x
-//            var y  = (sample.vertices[i].y - center.y)* currentUserData.scale + center.y
-//            newVertices.add(Vertex(x, y))
-//        }
-//        //newVertices = convertToVSD(newVertices)
-//        val builder = GLESSurfaceView.factory.select(sample.type)
-//        val newShape = builder?.build(
-//            sample.vertexCount,
-//            newVertices,
-//            sample.color,
-//            sample.size)
-//        while (0 < currentUserData.shapeLists[index].size){
-//            currentUserData.shapeLists[index].removeAt(0)
-//        }
-//        if (newShape != null) {
-//            this.addShapeAt(index, newShape)
-//        }
-//    }
-
         var newVertices = mutableListOf<Vertex>()
-        if (sample.drawMode == GLES20.GL_LINES )
+        if (sample.drawMode != GLES20.GL_POINTS )
             for (i in 0..<sample.vertices.size) {
                 val x  = (sample.vertices[i].x - center.x)* currentUserData.scale + center.x
                 val y  = (sample.vertices[i].y - center.y)* currentUserData.scale + center.y
                 newVertices.add(Vertex(x, y))
             }
         else {
+            if (sample.type == ShapeType.CIRCLE || sample.type == ShapeType.ELIPSE) {
+                var end = sample.endPoint
+                val rx = (end.x - center.x)* currentUserData.scale
+                val ry = (end.y - center.y)* currentUserData.scale
+                newVertices  =  setPossition(center.x, center.y, rx, ry)
+                if (currentUserData.scale > 1)
+                    sample.vertexCount = newVertices.size
+            }
 
         }
         val builder = GLESSurfaceView.factory.select(sample.type)
@@ -255,38 +239,51 @@ class GLESRenderer: GLSurfaceView.Renderer {
         }
     }
 
-    fun rotateShape(){
+    fun rotateShape(index: Int){
+        var A = cos(PI.toFloat() *currentUserData.rotate/180);
+        var B = sin(PI.toFloat() *currentUserData.rotate/180);
+        val sample = currentUserData.shapeLists[index][0]
+        var center = sample.centerPoint
+        var newVertices = mutableListOf<Vertex>()
+        var cx = 0f
+        var cy = 0f
+        if (sample.type == ShapeType.CIRCLE || sample.type == ShapeType.ELIPSE) {
+            cx = (center.x / viewHeight) * 2 - maxXCoord
+            cy =  1 - 2 * (center.y / viewHeight)
+        }
+        else {
+            cx = center.x
+            cy = center.y
+        }
+
+
+
+        for (i in 0..<sample.vertices.size) {
+
+            val x  = A*(sample.vertices[i].x - cx) - B*(sample.vertices[i].y - cy) + cx
+            val y  = B*(sample.vertices[i].x - cx) + A*(sample.vertices[i].y - cy) + cy
+            newVertices.add(Vertex(x, y))
+        }
+
+        val builder = GLESSurfaceView.factory.select(sample.type)
+        val newShape = builder?.build(
+            sample.vertexCount,
+            newVertices,
+            sample.color,
+            sample.size
+        )
+
+        while (currentUserData.shapeLists[index].size > 1) {
+            currentUserData.shapeLists[index].removeAt(1)
+        }
+        if (newShape != null) {
+            newShape.createProgram()
+            currentUserData.shapeLists[index].add(newShape)
+        }
 
     }
 
     fun translateShape(index: Int){
-
-//        val sample = currentUserData.shapeLists[index][0]
-//        var center = sample.centerPoint
-//        center.x = (center.x + maxXCoord) /2 * viewHeight
-//        center.y = (1 - center.y)/2 * viewHeight
-//        //convert vertices to WSD
-//        val vertices = convertToWSD(sample.vertices)
-//        var newVertices = mutableListOf<Vertex>()
-//        for (i in 0..<vertices.size) {
-//            var x  = vertices[i].x + currentUserData.hShift
-//            var y  = vertices[i].y + currentUserData.vShift
-//            newVertices.add(Vertex(x, y))
-//        }
-//        newVertices = convertToVSD(newVertices)
-//        val builder = GLESSurfaceView.factory.select(sample.type)
-//        val newShape = builder?.build(
-//            sample.vertexCount,
-//            newVertices,
-//            sample.color,
-//            sample.size)
-//        while (0 < currentUserData.shapeLists[index].size){
-//            currentUserData.shapeLists[index].removeAt(0)
-//        }
-//        if (newShape != null) {
-//            this.addShapeAt(index, newShape)
-//        }
-
         val sample = currentUserData.shapeLists[index][0]
         var newVertices = mutableListOf<Vertex>()
         for (i in 0..<sample.vertices.size) {
@@ -316,8 +313,28 @@ class GLESRenderer: GLSurfaceView.Renderer {
 
     }
 
-    fun shearShape(){
+    fun shearShape(index: Int){
+        val sample = currentUserData.shapeLists[index][0]
+        var newVertices = mutableListOf<Vertex>()
+        for (i in 0..<sample.vertices.size) {
+            var x  = sample.vertices[i].x + currentUserData.vSheer*sample.vertices[i].y
+            var y  = sample.vertices[i].y + currentUserData.hSheer*sample.vertices[i].x
+            newVertices.add(Vertex(x, y))
+        }
 
+        val builder = GLESSurfaceView.factory.select(sample.type)
+        val newShape = builder?.build(
+            sample.vertexCount,
+            newVertices,
+            sample.color,
+            sample.size)
+        while (currentUserData.shapeLists[index].size > 1) {
+            currentUserData.shapeLists[index].removeAt(1)
+        }
+        if (newShape != null) {
+            newShape.createProgram()
+            currentUserData.shapeLists[index].add(newShape)
+        }
     }
 
     @Throws(OutOfMemoryError::class)

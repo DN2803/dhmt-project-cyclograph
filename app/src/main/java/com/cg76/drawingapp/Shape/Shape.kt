@@ -30,6 +30,8 @@ abstract class Shape(
     private var _isTemp = false
     private var _isClone = false
     protected var _centerPoint = Vertex()
+    protected var _startPoint = Vertex()
+    protected var _endPoint = Vertex()
 
 
     var vertexCount: Int
@@ -67,6 +69,12 @@ abstract class Shape(
     var centerPoint: Vertex
         get() = _centerPoint
         set(centerPoint) {_centerPoint = centerPoint}
+    var startPoint: Vertex
+        get() = _startPoint
+        set(startPoint) {_startPoint = startPoint}
+    var endPoint: Vertex
+        get() = _endPoint
+        set(endPoint) {_endPoint = endPoint}
     
     companion object{
         private const val vertexShaderCode =
