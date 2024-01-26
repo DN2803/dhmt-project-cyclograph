@@ -2,11 +2,8 @@ package com.cg76.drawingapp.Shape
 
 import android.opengl.GLES20
 import com.cg76.drawingapp.GLESRenderer
-import java.lang.Long.max
 import kotlin.math.abs
-import kotlin.math.cos
 import kotlin.math.min
-import kotlin.math.sin
 
 class Circle: Shape{
     constructor(vertexCount: Int, vertices: MutableList<Vertex>, color: FloatArray,
@@ -44,7 +41,7 @@ fun Put4Pixel (centerX:Float, centerY: Float, vertices: MutableList<Vertex>):Mut
     }
 
 // Vẽ điểm đầu tiên để hoàn thành vòng tròn
-    putPixel(centerX + vertices.first().x, centerY + vertices.first().y, res)
+//    putPixel(centerX + vertices.first().x, centerY + vertices.first().y, res)
 
 
 // Vẽ điểm cuối cùng để hoàn thành vòng tròn
@@ -54,7 +51,7 @@ fun Put4Pixel (centerX:Float, centerY: Float, vertices: MutableList<Vertex>):Mut
 
     return res
 }
-fun setPossition (centerX: Float, centerY: Float, A: Float, B: Float): MutableList<Vertex>{
+fun setPosition (centerX: Float, centerY: Float, A: Float, B: Float): MutableList<Vertex>{
 
 
     var vertices = mutableListOf<Vertex>()
@@ -148,7 +145,7 @@ class CircleBuilder: ShapeBuilder{
         val x1 = (x2+ (if (x3>x2) 1 else -1)*rx)
         val y1 = (y2+ (if (y3>y2) 1 else -1)*rx)
 
-        var vertices = setPossition(x1, y1, rx, rx)
+        var vertices = setPosition(x1, y1, rx, rx)
         var res = Circle(vertices.size, vertices, color, size)
         res.centerPoint = Vertex(x1, y1)
         res.startPoint = Vertex(x1 - rx, y1 - rx)
@@ -192,7 +189,7 @@ class ElipseBuilder: ShapeBuilder{
         val x1 = (x2+ (if (x3>x2) 1 else -1)*rx)
         val y1 = (y2+ (if (y3>y2) 1 else -1)*ry)
 
-        var vertices = setPossition(x1, y1, rx, ry)
+        var vertices = setPosition(x1, y1, rx, ry)
         var res = Circle(vertices.size, vertices, color, size)
         res.centerPoint = Vertex(x1, y1)
         res.startPoint = Vertex(x1 - rx, y1 - ry)

@@ -201,31 +201,30 @@ class GLESRenderer: GLSurfaceView.Renderer {
 
     }
 
-    fun scaleShape(index: Int) {
 
+    fun scaleShape(index: Int) {
         val sample = currentUserData.shapeLists[index][0]
         var center = sample.centerPoint
         var newVertices = mutableListOf<Vertex>()
-        if (sample.drawMode != GLES20.GL_POINTS )
+        if (sample.type == ShapeType.CIRCLE || sample.type == ShapeType.ELIPSE) {
+            var end = sample.endPoint
+            val rx = (end.x - center.x)*currentUserData.scale
+            val ry = (end.y - center.y)*currentUserData.scale
+            newVertices  =  setPosition(center.x, center.y, rx, ry)
+
+
+        }
+        else {
             for (i in 0..<sample.vertices.size) {
                 val x  = (sample.vertices[i].x - center.x)* currentUserData.scale + center.x
                 val y  = (sample.vertices[i].y - center.y)* currentUserData.scale + center.y
                 newVertices.add(Vertex(x, y))
             }
-        else {
-            if (sample.type == ShapeType.CIRCLE || sample.type == ShapeType.ELIPSE) {
-                var end = sample.endPoint
-                val rx = (end.x - center.x)* currentUserData.scale
-                val ry = (end.y - center.y)* currentUserData.scale
-                newVertices  =  setPossition(center.x, center.y, rx, ry)
-                if (currentUserData.scale > 1)
-                    sample.vertexCount = newVertices.size
-            }
 
         }
         val builder = GLESSurfaceView.factory.select(sample.type)
         val newShape = builder?.build(
-            sample.vertexCount,
+            newVertices.size,
             newVertices,
             sample.color,
             sample.size
@@ -255,8 +254,6 @@ class GLESRenderer: GLSurfaceView.Renderer {
             cx = center.x
             cy = center.y
         }
-
-
 
         for (i in 0..<sample.vertices.size) {
 
@@ -376,5 +373,3 @@ fun loadShader(type: Int, shaderCode: String): Int {
 
     return shader
 }
-
-

@@ -136,6 +136,7 @@ class GLESSurfaceView @JvmOverloads constructor(
     }
 
     private fun scaleShape(){
+        if (currentUserData.scale == 0f) return
         for (i in 0..<currentUserData.isSelectedList.size) {
             if (currentUserData.isSelectedList[i]) {
                 queueEvent {
