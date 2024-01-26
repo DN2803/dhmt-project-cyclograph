@@ -558,6 +558,12 @@ class MainActivity : AppCompatActivity() {
             setAffine()
             affinePopup.dismiss()
         }
+        affinePopupBinding.apply.setOnClickListener {
+            // save hình
+            applyAffine()
+
+            affinePopup.dismiss()
+        }
     }
     private fun colorToRGBA(color: Int): FloatArray {
         val r =  Color.red(color)/255.0f
@@ -728,6 +734,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setOnSeekbar(seekBar: SeekBar, value: TextView, actionType: ActionType) {
+        value.text = "1"
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (seekBar != null) {
@@ -762,7 +769,17 @@ class MainActivity : AppCompatActivity() {
         currentUserData.rotate = 0f
         currentUserData.vSheer = 0f
         currentUserData.hSheer = 0f
+
+
+        ///
+        affinePopupBinding.transx.seekBar.setProgress(0)
+        affinePopupBinding.transy.seekBar.setProgress(0)
+        affinePopupBinding.scale.seekBar.setProgress(1)
+        affinePopupBinding.rotate.seekBar.setProgress(0)
+        affinePopupBinding.sheerx.seekBar.setProgress(0)
+        affinePopupBinding.sheery.seekBar.setProgress(0)
     }
+    var setDefault: Boolean = false
     @RequiresApi(Build.VERSION_CODES.O)
     private fun setOnSeekbarAffine(
         type: String, typeTxt: TextView, seekBar: SeekBar, valueTxt: TextView,
@@ -773,15 +790,19 @@ class MainActivity : AppCompatActivity() {
         seekBar.max = max.toInt()
         unitTxt.text = unit
 
+
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+
                 valueTxt.text = seekBar?.progress.toString()
 
                 glSurfaceView.requestRender(actionType)
                 setAffine()
+
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
+
 
             }
 
