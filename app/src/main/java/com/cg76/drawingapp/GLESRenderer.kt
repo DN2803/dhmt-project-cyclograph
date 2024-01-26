@@ -317,8 +317,8 @@ class GLESRenderer: GLSurfaceView.Renderer {
         val sample = currentUserData.shapeLists[index][0]
         var newVertices = mutableListOf<Vertex>()
         for (i in 0..<sample.vertices.size) {
-            var x  = sample.vertices[i].x + currentUserData.vSheer*sample.vertices[i].y
-            var y  = sample.vertices[i].y + currentUserData.hSheer*sample.vertices[i].x
+            var x  = sample.vertices[i].x + (currentUserData.vSheer/45)*sample.vertices[i].y
+            var y  = sample.vertices[i].y + (currentUserData.hSheer/45)*sample.vertices[i].x
             newVertices.add(Vertex(x, y))
         }
 
@@ -328,6 +328,7 @@ class GLESRenderer: GLSurfaceView.Renderer {
             newVertices,
             sample.color,
             sample.size)
+        newShape?.drawMode = GLES20.GL_LINE_LOOP
         while (currentUserData.shapeLists[index].size > 1) {
             currentUserData.shapeLists[index].removeAt(1)
         }

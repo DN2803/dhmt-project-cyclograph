@@ -176,7 +176,6 @@ class GLESSurfaceView @JvmOverloads constructor(
         requestRender()
     }
     private fun shearShape() {
-        if(currentUserData.hShift == 0f && currentUserData.vShift == 0f) return
         for (i in 0..<currentUserData.isSelectedList.size)
             if (currentUserData.isSelectedList[i]) {
                 queueEvent {

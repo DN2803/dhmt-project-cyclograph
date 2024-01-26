@@ -23,17 +23,42 @@ fun putPixel (intX: Float, intY: Float, vertices: MutableList<Vertex>) {
     vertices.add(Vertex(x, y, z))
     return
 }
-fun Put4Pixel (centerX:Float, centerY: Float, rX: Float, rY: Float, vertices: MutableList<Vertex>) {
-    putPixel(centerX + rX, centerY+ rY, vertices)
-    putPixel(centerX - rX, centerY - rY, vertices)
-    putPixel(centerX + rX, centerY - rY, vertices)
-    putPixel(centerX - rX, centerY + rY, vertices)
-    return
+fun Put4Pixel (centerX:Float, centerY: Float, vertices: MutableList<Vertex>):MutableList<Vertex> {
+    var res = mutableListOf<Vertex>()
+
+// Vòng lặp theo chiều thuận kim đồng hồ
+    for (i in 0 until  vertices.size) {
+        putPixel(centerX + vertices[i].x, centerY + vertices[i].y, res)
+    }
+
+    for (i in vertices.size - 1 downTo 0) {
+        putPixel(centerX + vertices[i].x, centerY - vertices[i].y, res)
+    }
+
+    for (i in 0 until  vertices.size) {
+        putPixel(centerX - vertices[i].x, centerY - vertices[i].y, res)
+    }
+
+    for (i in vertices.size - 1 downTo 0) {
+        putPixel(centerX - vertices[i].x, centerY + vertices[i].y, res)
+    }
+
+// Vẽ điểm đầu tiên để hoàn thành vòng tròn
+    putPixel(centerX + vertices.first().x, centerY + vertices.first().y, res)
+
+
+// Vẽ điểm cuối cùng để hoàn thành vòng tròn
+    //putPixel(centerX + vertices.last().x, centerY + vertices.last().y, res)
+
+
+
+    return res
 }
 fun setPossition (centerX: Float, centerY: Float, A: Float, B: Float): MutableList<Vertex>{
 
 
     var vertices = mutableListOf<Vertex>()
+    var temp_vertices = mutableListOf<Vertex>()
 
     var A2: Float
     var B2: Float
@@ -58,8 +83,8 @@ fun setPossition (centerX: Float, centerY: Float, A: Float, B: Float): MutableLi
     y      = B;
     Delta1 = B2*(2*x+3);
     Delta2 = 2*A2*(1-y)+B2*(2*x+3);
-    Put4Pixel(centerX, centerY, x, y, vertices);
-    while (x<MaxX)
+    temp_vertices.add(Vertex(x , y))
+    while (x<=MaxX)
     {
         if (p>=0)
         {
@@ -73,7 +98,7 @@ fun setPossition (centerX: Float, centerY: Float, A: Float, B: Float): MutableLi
         Delta1+=Const1;
         x++;
 
-        Put4Pixel(centerX, centerY, x, y, vertices);
+        temp_vertices.add(Vertex(x , y))
     }
     p      = (A2-A*B2+B2/4);
     Const1 = 2*A2;
@@ -82,8 +107,8 @@ fun setPossition (centerX: Float, centerY: Float, A: Float, B: Float): MutableLi
     y      = 0f;
     Delta1 = A2*(2*y+3);
     Delta2 = 2*B2*(1-x)+A2*(2*y+3);
-    Put4Pixel(centerX, centerY, x, y, vertices);
-    while (y<MaxY)
+    temp_vertices.add(Vertex(x , y))
+    while (y<=MaxY)
     {
         if (p>=0)
         {
@@ -97,8 +122,11 @@ fun setPossition (centerX: Float, centerY: Float, A: Float, B: Float): MutableLi
         Delta2+=Const1;
         Delta1+=Const1;
         y++;
-        Put4Pixel(centerX, centerY, x, y, vertices);
+        temp_vertices.add(Vertex(x , y))
     }
+    temp_vertices.sortByDescending {it.y}
+    //temp_vertices.sortBy { it.x }
+    vertices = Put4Pixel(centerX, centerY, temp_vertices)
     return vertices
 }
 class CircleBuilder: ShapeBuilder{
