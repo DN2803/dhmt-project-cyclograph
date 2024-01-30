@@ -17,7 +17,6 @@ import kotlin.math.sin
 
 class GLESRenderer: GLSurfaceView.Renderer {
 
-
     override fun onSurfaceCreated(unused: GL10, config: EGLConfig) {
         // Set the background frame color
         GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f)
@@ -25,12 +24,12 @@ class GLESRenderer: GLSurfaceView.Renderer {
         GLES20.glEnable(GLES20.GL_BLEND)
         GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA,GLES20.GL_ONE_MINUS_SRC_ALPHA)
 
-        var xAxis = Line(
+        val xAxis = Line(
             2,
             mutableListOf(Vertex(-1f,0f), Vertex(1f,0f)),
             floatArrayOf(0f,0f,0f,0.4f),
             3f)
-        var yAxis = Line(
+        val yAxis = Line(
             2,
             mutableListOf(Vertex(0f,-1f), Vertex(0f,1f)),
             floatArrayOf(0f,0f,0f,0.4f),
@@ -38,7 +37,7 @@ class GLESRenderer: GLSurfaceView.Renderer {
 
         xAxis.createProgram()
         yAxis.createProgram()
-        currentUserData.shapeLists.add(mutableListOf(xAxis,yAxis))
+        currentUserData.shapeLists[0] = (mutableListOf(xAxis,yAxis))
 
     }
 
@@ -76,6 +75,10 @@ class GLESRenderer: GLSurfaceView.Renderer {
         }
 
         currentUserData.bitmap = createBitmapFromGLSurface()
+
+        while (currentUserData.shapeLists.last().size>2){
+            currentUserData.shapeLists.last().removeAt(2)
+        }
 
         for (shape in currentUserData.shapeLists.last()){
             shape.draw(scratch, shape.drawMode)
@@ -134,24 +137,6 @@ class GLESRenderer: GLSurfaceView.Renderer {
             currentUserData.shapeLists[index].removeAt(1)
         }
     }
-    private fun convertToWSD (vertices: MutableList<Vertex>): MutableList<Vertex> {
-        var result = mutableListOf<Vertex>()
-        for (i in 0..< vertices.size) {
-            var x_new = (vertices[i].x + maxXCoord) /2 * viewHeight
-            var y_new = (1 - vertices[i].y)/2 * viewHeight
-            result.add(Vertex(x_new, y_new))
-        }
-        return result.toMutableList()
-    }
-    private fun convertToVSD (vertices: MutableList<Vertex>): MutableList<Vertex> {
-        var result = mutableListOf<Vertex>()
-        for (i in 0..< vertices.size) {
-            var x_new = (vertices[i].x / viewHeight) * 2 - maxXCoord
-            var y_new = 1 - 2 * (vertices[i].y / viewHeight)
-            result.add(Vertex(x_new, y_new))
-        }
-        return result.toMutableList()
-    }
 
     fun generateCyclograph(index: Int){
         clearCloneShapesAt(index)
@@ -192,27 +177,26 @@ class GLESRenderer: GLSurfaceView.Renderer {
     }
 
     fun colorShape(index: Int){
-//        for (i in 0..<activeList.size){
-//            if (activeList[i]){
-//                shapes[i].color = color
-//            }
-//        }
         currentUserData.shapeLists[index][0].color = currentUserData.color
+    }
 
+    fun setShapeStroke(index: Int) {
+        if (currentUserData.stroke < 1) return
+        for (shape in currentUserData.shapeLists[index]){
+            shape.size = currentUserData.stroke
+        }
     }
 
 
     fun scaleShape(index: Int) {
         val sample = currentUserData.shapeLists[index][0]
-        var center = sample.centerPoint
+        val center = sample.centerPoint
         var newVertices = mutableListOf<Vertex>()
         if (sample.type == ShapeType.CIRCLE || sample.type == ShapeType.ELIPSE) {
-            var end = sample.endPoint
+            val end = sample.endPoint
             val rx = (end.x - center.x)*currentUserData.scale
             val ry = (end.y - center.y)*currentUserData.scale
-            newVertices  =  setPosition(center.x, center.y, rx, ry)
-
-
+            newVertices  =  setPosition(center.x, center.y, rx, ry)            
         }
         else {
             for (i in 0..<sample.vertices.size) {
@@ -223,10 +207,12 @@ class GLESRenderer: GLSurfaceView.Renderer {
 
         }
         val builder = GLESSurfaceView.factory.select(sample.type)
+        val newColor = sample.color
+        newColor[3] = (sample.color[3]*0.2).toFloat()
         val newShape = builder?.build(
             newVertices.size,
             newVertices,
-            sample.color,
+            newColor,
             sample.size
         )
         while (currentUserData.shapeLists[index].size > 1) {
@@ -239,13 +225,13 @@ class GLESRenderer: GLSurfaceView.Renderer {
     }
 
     fun rotateShape(index: Int){
-        var A = cos(PI.toFloat() *currentUserData.rotate/180);
-        var B = sin(PI.toFloat() *currentUserData.rotate/180);
+        val A = cos(PI.toFloat() *currentUserData.rotate/180);
+        val B = sin(PI.toFloat() *currentUserData.rotate/180);
         val sample = currentUserData.shapeLists[index][0]
-        var center = sample.centerPoint
+        val center = sample.centerPoint
         var newVertices = mutableListOf<Vertex>()
-        var cx = 0f
-        var cy = 0f
+        val cx: Float
+        val cy: Float
         if (sample.type == ShapeType.CIRCLE || sample.type == ShapeType.ELIPSE) {
             cx = (center.x / viewHeight) * 2 - maxXCoord
             cy =  1 - 2 * (center.y / viewHeight)
@@ -256,17 +242,18 @@ class GLESRenderer: GLSurfaceView.Renderer {
         }
 
         for (i in 0..<sample.vertices.size) {
-
             val x  = A*(sample.vertices[i].x - cx) - B*(sample.vertices[i].y - cy) + cx
             val y  = B*(sample.vertices[i].x - cx) + A*(sample.vertices[i].y - cy) + cy
             newVertices.add(Vertex(x, y))
         }
 
         val builder = GLESSurfaceView.factory.select(sample.type)
+        val newColor = sample.color
+        newColor[3] = (sample.color[3]*0.2).toFloat()
         val newShape = builder?.build(
             sample.vertexCount,
             newVertices,
-            sample.color,
+            newColor,
             sample.size
         )
 
@@ -284,16 +271,18 @@ class GLESRenderer: GLSurfaceView.Renderer {
         val sample = currentUserData.shapeLists[index][0]
         var newVertices = mutableListOf<Vertex>()
         for (i in 0..<sample.vertices.size) {
-            var x  = sample.vertices[i].x + currentUserData.hShift
-            var y  = sample.vertices[i].y + currentUserData.vShift
+            val x  = sample.vertices[i].x + currentUserData.hShift
+            val y  = sample.vertices[i].y + currentUserData.vShift
             newVertices.add(Vertex(x, y))
         }
 
         val builder = GLESSurfaceView.factory.select(sample.type)
+        val newColor = sample.color.clone()
+        newColor[3] = (sample.color[3]*0.2).toFloat()
         val newShape = builder?.build(
             sample.vertexCount,
             newVertices,
-            sample.color,
+            newColor,
             sample.size)
         while (currentUserData.shapeLists[index].size > 1) {
             currentUserData.shapeLists[index].removeAt(1)
@@ -306,24 +295,26 @@ class GLESRenderer: GLSurfaceView.Renderer {
 //        currentUserData.vShift = 0f
     }
 
-    fun mirrorShape(){
-
-    }
+//    fun mirrorShape(){
+//
+//    }
 
     fun shearShape(index: Int){
         val sample = currentUserData.shapeLists[index][0]
         var newVertices = mutableListOf<Vertex>()
         for (i in 0..<sample.vertices.size) {
-            var x  = sample.vertices[i].x + (currentUserData.vSheer/45)*sample.vertices[i].y
-            var y  = sample.vertices[i].y + (currentUserData.hSheer/45)*sample.vertices[i].x
+            val x  = sample.vertices[i].x + (currentUserData.vSheer/45)*sample.vertices[i].y
+            val y  = sample.vertices[i].y + (currentUserData.hSheer/45)*sample.vertices[i].x
             newVertices.add(Vertex(x, y))
         }
 
         val builder = GLESSurfaceView.factory.select(sample.type)
+        val newColor = sample.color
+        newColor[3] = (sample.color[3]*0.2).toFloat()
         val newShape = builder?.build(
             sample.vertexCount,
             newVertices,
-            sample.color,
+            newColor,
             sample.size)
         newShape?.drawMode = GLES20.GL_LINE_LOOP
         while (currentUserData.shapeLists[index].size > 1) {

@@ -18,6 +18,7 @@ data class UserData(
     var copies: Int = 0,
     var bitmap: Bitmap? = null,
     // data for transformation,
+    //var affinePreviewShape: Shape? = null,
     var vShift: Float = 0f,
     var hShift: Float = 0f,
     var scale: Float = 1f,

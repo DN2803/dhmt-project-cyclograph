@@ -103,33 +103,39 @@ class GLESSurfaceView @JvmOverloads constructor(
     fun requestRender(actionType: ActionType){
         when(actionType){
             COLOR -> colorShape()
+            STROKE -> setShapeStroke()
             SCALE -> scaleShape()
             ROTATE -> rotateShape()
             TRANSLATE -> translateShape()
-            MIRROR -> mirrorShape()
+            //MIRROR -> mirrorShape()
             SHEAR -> shearShape()
             GENCYCLO -> genCycloGraph()
-            else -> ""
         }
     }
 
     private fun genCycloGraph() {
-        for (i in 0..<currentUserData.isSelectedList.size){
-            if (currentUserData.isSelectedList[i])
-                queueEvent {
-                    renderer.generateCyclograph(i)
-                }
-        }
+        for (i in 0 until currentUserData.isSelectedList.size){
+            if (currentUserData.isSelectedList[i]){
+                queueEvent { renderer.generateCyclograph(i) }
+                requestRender()
+            }
 
-        requestRender()
+        }
     }
 
     private fun colorShape(){
-        for (i in 0..<currentUserData.isSelectedList.size) {
+        for (i in 0 until currentUserData.isSelectedList.size) {
             if (currentUserData.isSelectedList[i]) {
-                queueEvent {
-                    renderer.colorShape(i)
-                }
+                queueEvent { renderer.colorShape(i) }
+                requestRender()
+            }
+        }
+    }
+
+    private fun setShapeStroke() {
+        for (i in 0 until currentUserData.isSelectedList.size) {
+            if (currentUserData.isSelectedList[i]) {
+                queueEvent { renderer.setShapeStroke(i) }
                 requestRender()
             }
         }
@@ -137,22 +143,18 @@ class GLESSurfaceView @JvmOverloads constructor(
 
     private fun scaleShape(){
         if (currentUserData.scale == 0f) return
-        for (i in 0..<currentUserData.isSelectedList.size) {
+        for (i in 0 until currentUserData.isSelectedList.size) {
             if (currentUserData.isSelectedList[i]) {
-                queueEvent {
-                    renderer.scaleShape(i)
-                }
+                queueEvent { renderer.scaleShape(i) }
                 requestRender()
             }
         }
     }
 
     private fun rotateShape(){
-        for (i in 0..<currentUserData.isSelectedList.size) {
+        for (i in 0 until currentUserData.isSelectedList.size) {
             if (currentUserData.isSelectedList[i]) {
-                queueEvent {
-                    renderer.rotateShape(i)
-                }
+                queueEvent { renderer.rotateShape(i) }
                 requestRender()
             }
         }
@@ -160,31 +162,26 @@ class GLESSurfaceView @JvmOverloads constructor(
 
     private fun translateShape(){
         if(currentUserData.hShift == 0f && currentUserData.vShift == 0f) return
-        for (i in 0..<currentUserData.isSelectedList.size)
+        for (i in 0 until currentUserData.isSelectedList.size)
             if (currentUserData.isSelectedList[i]) {
-                queueEvent {
-                    renderer.translateShape(i)
-                }
+                queueEvent { renderer.translateShape(i) }
                 requestRender()
             }
-
     }
 
-    private fun mirrorShape(){
-        queueEvent{
-            renderer.mirrorShape()
-        }
-        requestRender()
-    }
+//    private fun mirrorShape(){
+//        queueEvent{
+//            renderer.mirrorShape()
+//        }
+//        requestRender()
+//    }
+
     private fun shearShape() {
-        for (i in 0..<currentUserData.isSelectedList.size)
+        for (i in 0 until currentUserData.isSelectedList.size)
             if (currentUserData.isSelectedList[i]) {
-                queueEvent {
-                    renderer.shearShape(i)
-                }
+                queueEvent { renderer.shearShape(i) }
+                requestRender()
             }
-        requestRender()
-
     }
 
 

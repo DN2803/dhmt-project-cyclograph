@@ -16,7 +16,7 @@ enum class ShapeType{
 }
 
 enum class ActionType{
-     DRAW, STROKE, COLOR, FOO, SCALE, ROTATE, TRANSLATE, MIRROR, SHEAR, GENCYCLO
+     STROKE, COLOR, SCALE, ROTATE, TRANSLATE, SHEAR, GENCYCLO
 }
 
 abstract class Shape(
@@ -28,7 +28,6 @@ abstract class Shape(
     protected abstract var _drawMode: Int
     protected abstract var _type: ShapeType
     private var _isTemp = false
-    private var _isClone = false
     protected var _centerPoint = Vertex()
     protected var _startPoint = Vertex()
     protected var _endPoint = Vertex()
@@ -57,10 +56,6 @@ abstract class Shape(
     var isTemp: Boolean
         get() = _isTemp
         set(isTemp) {_isTemp = isTemp}
-
-    var isClone: Boolean
-        get() = _isClone
-        set(isClone) {_isClone = isClone}
 
     var type: ShapeType
         get() = _type

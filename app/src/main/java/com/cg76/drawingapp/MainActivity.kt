@@ -3,11 +3,9 @@ package com.cg76.drawingapp
 import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.ContentValues
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.PorterDuff
-import android.graphics.SurfaceTexture
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
@@ -30,24 +28,19 @@ import com.cg76.drawingapp.databinding.StrokePopupBinding
 import android.graphics.drawable.LayerDrawable
 import android.icu.text.SimpleDateFormat
 import android.net.Uri
-import android.opengl.GLES20
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
-import android.view.PixelCopy
-import android.view.Surface
 import android.widget.GridLayout
 import android.widget.Toast
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.get
-import com.cg76.drawingapp.GLESRenderer.Companion.maxXCoord
 import com.cg76.drawingapp.GLESRenderer.Companion.viewHeight
+import com.cg76.drawingapp.GLESRenderer.Companion.viewWidth
 import com.cg76.drawingapp.databinding.MenuPopupBinding
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
-import java.nio.ByteBuffer
 import java.util.Date
 import java.util.Locale
 
@@ -63,6 +56,7 @@ class MainActivity : AppCompatActivity() {
         var context: MainActivity? = null
         private var buttonCount = 0
 
+        @SuppressLint("SetTextI18n")
         fun addLayerButton() {
             val newButton = Button(context)
 
@@ -92,11 +86,7 @@ class MainActivity : AppCompatActivity() {
             layerList.addView(newButton)
 
         }
-
-
-
     }
-
 
     private val actionButtons = mutableListOf<ImageButton>()
 
@@ -127,8 +117,6 @@ class MainActivity : AppCompatActivity() {
     private val menuPopupBinding: MenuPopupBinding by lazy {
         MenuPopupBinding.inflate(layoutInflater)
     }
-
-
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -172,7 +160,7 @@ class MainActivity : AppCompatActivity() {
             layerList.invalidate()
 
             buttonCount=0
-            for (i in 0 until currentUserData.shapeLists.size - 2){
+            for (i in 0 until currentUserData.shapeLists.size-1){
                 addLayerButton()
             }
             glSurfaceView.requestRender()
@@ -232,8 +220,6 @@ class MainActivity : AppCompatActivity() {
             layoutParams.dimAmount = 0.0f
             window!!.setBackgroundDrawable(ColorDrawable(Color.argb(0, 0, 0, 0)))
 
-
-
             setCancelable(true)
         }
 
@@ -244,8 +230,6 @@ class MainActivity : AppCompatActivity() {
             window!!.setLayout(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
-
-
             )
             // Set the X and Y position of the dialog
             val layoutParams = window!!.attributes
@@ -254,7 +238,6 @@ class MainActivity : AppCompatActivity() {
             window!!.setBackgroundDrawable(ColorDrawable(Color.argb(0, 0, 0, 0)))
 
             setCancelable(false)
-
         }
 
         // use to pick stroke
@@ -264,8 +247,6 @@ class MainActivity : AppCompatActivity() {
             window!!.setLayout(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
-
-
             )
             // Set the X and Y position of the dialog
             val layoutParams = window!!.attributes
@@ -278,7 +259,6 @@ class MainActivity : AppCompatActivity() {
 //            layoutParams.y = bottomMarginInPixels
 
             setCancelable(true)
-
         }
 
         val generPopup = Dialog(this).apply {
@@ -287,15 +267,12 @@ class MainActivity : AppCompatActivity() {
             window!!.setLayout(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
-
-
             )
             // Set the X and Y position of the dialog
             val layoutParams = window!!.attributes
             layoutParams.gravity = Gravity.BOTTOM
             layoutParams.dimAmount = 0.0f
             window!!.setBackgroundDrawable(ColorDrawable(Color.argb(0, 0, 0, 0)))
-
 
             setCancelable(false)
 
@@ -307,15 +284,12 @@ class MainActivity : AppCompatActivity() {
             window!!.setLayout(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
-
-
             )
             // Set the X and Y position of the dialog
             val layoutParams = window!!.attributes
             layoutParams.gravity = Gravity.BOTTOM
             layoutParams.dimAmount = 0.0f
             window!!.setBackgroundDrawable(ColorDrawable(Color.argb(0, 0, 0, 0)))
-
 
             setCancelable(true)
 
@@ -365,7 +339,7 @@ class MainActivity : AppCompatActivity() {
             affinePopupBinding.transx.typeTxt,
             affinePopupBinding.transx.seekBar,
             affinePopupBinding.transx.ValueTxt,
-            -100f, 100f,
+            -1000f, 1000f,
             "pixel", affinePopupBinding.transx.unitTxt,
             ActionType.TRANSLATE
         )
@@ -374,7 +348,7 @@ class MainActivity : AppCompatActivity() {
             affinePopupBinding.transy.typeTxt,
             affinePopupBinding.transy.seekBar,
             affinePopupBinding.transy.ValueTxt,
-            -100f, 100f,
+            -1000f, 1000f,
             "pixel", affinePopupBinding.transy.unitTxt,
             ActionType.TRANSLATE
         )
@@ -415,9 +389,6 @@ class MainActivity : AppCompatActivity() {
             ActionType.SHEAR
         )
 
-
-
-
         colorPopupBinding.done.setOnClickListener {
             //colorPopup.visibility = View.GONE
             colorPopup.dismiss()
@@ -434,8 +405,6 @@ class MainActivity : AppCompatActivity() {
             //colorPopup.visibility = View.VISIBLE
             colorPopup.show()
             onButtonClicked(colorPickerButton)
-
-
         }
 
         colorPopupBinding.style1.setOnClickListener {
@@ -449,7 +418,7 @@ class MainActivity : AppCompatActivity() {
 
             // Mảng chứa mã màu của các màu cơ bản
             val basicColors = arrayOf(
-               "#FF0000",
+                "#FF0000",
                 "#A52A2A",
                 "#800080",
                 "#FFC0CB",
@@ -492,8 +461,6 @@ class MainActivity : AppCompatActivity() {
             colorPopupBinding.palette.visibility = View.GONE
             colorPopupBinding.rgbaSlider.visibility = View.VISIBLE
         }
-
-
 
         shapePickerButton.setOnClickListener {
             shapePopup.show()
@@ -577,8 +544,8 @@ class MainActivity : AppCompatActivity() {
     }
     private fun setAffine() {
 
-        currentUserData.vShift = affinePopupBinding.transx.seekBar.progress.toFloat()/(2*viewHeight)
-        currentUserData.hShift = affinePopupBinding.transy.seekBar.progress.toFloat()/(2*viewHeight)
+        currentUserData.vShift = affinePopupBinding.transx.seekBar.progress.toFloat()/(viewHeight)
+        currentUserData.hShift = affinePopupBinding.transy.seekBar.progress.toFloat()/(viewHeight)
         currentUserData.rotate = affinePopupBinding.rotate.seekBar.progress.toFloat()
         currentUserData.vSheer = affinePopupBinding.sheerx.seekBar.progress.toFloat()
         currentUserData.hSheer = affinePopupBinding.sheery.seekBar.progress.toFloat()
@@ -761,6 +728,7 @@ class MainActivity : AppCompatActivity() {
     fun applyAffine() {
         for (i in 0..<currentUserData.isSelectedList.size)
             if (currentUserData.isSelectedList[i]) {
+                currentUserData.shapeLists[i].last().color = currentUserData.shapeLists[i].first().color
                 currentUserData.shapeLists[i].removeFirst()
             }
         currentUserData.vShift = 0f
